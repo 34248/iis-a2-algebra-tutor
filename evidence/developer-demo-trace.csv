@@ -1,0 +1,4 @@
+﻿trace_id,run_kind,timestamp_utc,elapsed_ms,event,practice_problem,condition,version,status,shown_steps,attempt_count,transfer_problem,correct
+21215176dbb7aa63,developer_demo,2026-11-02T12:55:12.492355+00:00,0,start,A01,gradual,revised,ready,0,0,,
+21215176dbb7aa63,developer_demo,2026-11-02T12:55:12.818482+00:00,328,attempt,A01,gradual,revised,ready,0,1,,
+21215176dbb7aa63,developer_demo,2026-11-02T12:55:13.046375+00:00,562,hint,A01,gradual,revised,ready,1,1,,

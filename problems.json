@@ -1,0 +1,22 @@
+[
+  {
+    "id": "A01",
+    "question": "2x + 3 = 11",
+    "answer": 4,
+    "steps": [
+      "Subtract 3 from both sides: 2x = 8.",
+      "Divide both sides by 2: x = 4.",
+      "Check by substitution: 2(4) + 3 = 11."
+    ]
+  },
+  {
+    "id": "A02",
+    "question": "3x - 5 = 10",
+    "answer": 5,
+    "steps": [
+      "Add 5 to both sides: 3x = 15.",
+      "Divide both sides by 3: x = 5.",
+      "Check by substitution: 3(5) - 5 = 10."
+    ]
+  }
+]

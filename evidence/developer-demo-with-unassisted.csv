@@ -1,0 +1,5 @@
+﻿trace_id,run_kind,timestamp_utc,elapsed_ms,event,practice_problem,condition,version,status,shown_steps,attempt_count,transfer_problem,correct
+69d1c0e4cd75c7b7,developer_demo,2026-11-02T12:55:14.013287+00:00,0,start,A01,gradual,revised,ready,0,0,,
+69d1c0e4cd75c7b7,developer_demo,2026-11-02T12:55:14.067463+00:00,47,attempt,A01,gradual,revised,ready,0,1,,
+69d1c0e4cd75c7b7,developer_demo,2026-11-02T12:55:14.124738+00:00,109,hint,A01,gradual,revised,ready,1,1,,
+69d1c0e4cd75c7b7,developer_demo,2026-11-02T12:55:14.225300+00:00,203,unassisted_check,A01,gradual,revised,ready,1,1,T01,True

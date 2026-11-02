@@ -1,0 +1,25 @@
+Codex-run developer checks; not participant data.
+
+test_attempt_unlocks_one_step_at_a_time (test_app.TutorChecks.test_attempt_unlocks_one_step_at_a_time) ... ok
+test_baseline_reproduces_problem_before_retest (test_app.TutorChecks.test_baseline_reproduces_problem_before_retest) ... ok
+test_conditions_share_identical_checked_content (test_app.TutorChecks.test_conditions_share_identical_checked_content) ... ok
+test_corrected_input_can_restart (test_app.TutorChecks.test_corrected_input_can_restart) ... ok
+test_empty_attempt_does_not_unlock (test_app.TutorChecks.test_empty_attempt_does_not_unlock) ... ok
+test_final_answer_and_bad_fraction_do_not_reveal_solution (test_app.TutorChecks.test_final_answer_and_bad_fraction_do_not_reveal_solution) ... ok
+test_gradual_does_not_disclose_without_attempt (test_app.TutorChecks.test_gradual_does_not_disclose_without_attempt) ... ok
+test_malformed_model_does_not_release_steps (test_app.TutorChecks.test_malformed_model_does_not_release_steps) ... ok
+test_revised_rejects_incomplete_input (test_app.TutorChecks.test_revised_rejects_incomplete_input) ... ok
+test_sessions_do_not_share_progress (test_app.TutorChecks.test_sessions_do_not_share_progress) ... ok
+test_unassisted_problems_have_no_hint_output (test_app.TutorChecks.test_unassisted_problems_have_no_hint_output) ... ok
+test_unavailable_keeps_existing_progress (test_app.TutorChecks.test_unavailable_keeps_existing_progress) ... ok
+test_unsupported_equation_is_not_solved (test_app.TutorChecks.test_unsupported_equation_is_not_solved) ... ok
+test_disk_error_keeps_practice_usable_and_reports_export_status (test_trace.TraceChecks.test_disk_error_keeps_practice_usable_and_reports_export_status) ... ok
+test_export_contains_actions_not_free_text_or_session_tokens (test_trace.TraceChecks.test_export_contains_actions_not_free_text_or_session_tokens) ... ok
+test_invalid_hint_is_recorded_as_no_step_release (test_trace.TraceChecks.test_invalid_hint_is_recorded_as_no_step_release) ... ok
+test_trace_export_is_scoped_to_each_session (test_trace.TraceChecks.test_trace_export_is_scoped_to_each_session) ... ok
+test_unknown_export_refuses (test_trace.TraceChecks.test_unknown_export_refuses) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.097s
+
+OK

@@ -1,0 +1,26 @@
+{
+  "run_kind": "developer_demo",
+  "date": "2026-11-02",
+  "browser": "Microsoft Edge",
+  "passed": true,
+  "checks": [
+    "attempt gate",
+    "one-step release",
+    "identical mode content",
+    "CSV download",
+    "no free-text trace",
+    "input blocking",
+    "correction and restart",
+    "unassisted answer",
+    "unassisted trace event",
+    "unknown export refusal",
+    "cross-origin refusal",
+    "second checked exercise",
+    "labelled baseline failure",
+    "unavailable-response preservation",
+    "mobile layout",
+    "no browser errors"
+  ],
+  "screenshots": 6,
+  "participant_study": false
+}

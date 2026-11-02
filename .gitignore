@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+data/
+.env
+.env.*
+*.log
+
+node_modules/
+package-lock.json
+evidence/development.bundle
