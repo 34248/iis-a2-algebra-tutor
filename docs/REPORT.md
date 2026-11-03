@@ -1,6 +1,6 @@
 # Controlled Help in an Algebra Tutoring Prototype
 
-Formatted Word/PDF count: 1167 total; abstract 118; main text 1049 including headings, AI acknowledgement and repository status. Figure labels/captions and references excluded.
+Formatted Word/PDF count: 1166 total; abstract 118; main text 1048 including headings, AI acknowledgement and repository status. Figure labels/captions and references excluded.
 
 ## Abstract
 
@@ -24,7 +24,7 @@ Kim et al. (2009) reported an interaction between tutorial method and conceptual
 
 ## Architecture and illustrated interaction
 
-Figure 1 shows the implemented boundaries. The browser sends the selected equation, condition and action to a local Python controller. The controller holds session state and passes checked problem data and the permitted reveal count to the offline response function. That function returns the corresponding prefix of the item's stored solution steps. The controller checks the returned prefix against the checked content before display. Unexpected output releases no additional step. This applies Week 3’s distinction between model instructions, supplied data and the application’s enforcement of an interaction contract (University of Birmingham, 2026).
+Figure 1 shows the implemented boundaries. The browser sends an equation, condition and action to a local Python controller. It holds session state and passes checked problem data and the permitted reveal count to an offline response function, which returns a prefix of the stored steps. Before display, the controller validates response status and steps and supplies its own acknowledgement. Unexpected output releases no new step. This applies Week 3’s distinction between model instructions, supplied data and the application’s enforcement of an interaction contract (University of Birmingham, 2026).
 
 Example 1 contrasts a recorded attempt followed by one requested hint with the complete immediate solution. Example 2 shows the incomplete input being blocked and a corrected equation restarting successfully. Example 3 checks a new equation without revealing worked steps, then exports the interaction trace. Numeric correctness checks use exact rational arithmetic. They do not score conceptual explanations. An injected unavailable response retains earlier steps and reports the interruption, allowing inspection of recovery without pretending that a successful new answer arrived.
 
@@ -42,7 +42,7 @@ The A2 extension adds a session trace containing timestamps, elapsed time, condi
 
 The timer begins when a practice session first records an event. It therefore excludes setup time and cannot establish total task effort. Restarting creates a different trace rather than silently appending a second condition. No automatic group allocation, participant consent workflow or effort questionnaire is implemented. These omissions matter when interpreting exported records: a sequence of successful software actions cannot be reported as an independently administered learning experiment.
 
-The checked version passes 18 automated code tests and 18 browser checks. Evidence includes mode-content equality, refusal of unsupported input, session separation, failed-response handling, mobile layout and actual CSV downloads. Two demonstration CSV files are explicitly labelled developer_demo. These records were produced by Codex automation, not participants. The browser check exposed a restart/input timing problem; moving input clearing before the asynchronous start request prevented newly typed work being erased. Further checks found conflicting controls remained available during delayed replies and old feedback survived an unaided-item change. Pending requests now lock conflicting controls; changing the item clears its feedback. File-write failure still leaves in-memory export available.
+The checked version passes 27 code tests and 22 browser checks. These cover identical mode content, rejected input, session separation, injected response failures and actual CSV downloads. Two demonstration CSV files are labelled developer_demo; developer checks use developer_check. They contain no participant observations. Review found that malformed numeric entries were scored as wrong and declined responses could release steps. Invalid entries now have a separate event; response validation rejects unsuitable output. A shared lock keeps state changes and trace recording together under overlapping requests. Browser checks also cover stale feedback after editing an answer and CSV download when a server copy cannot be saved. The README records these corrections.
 
 Bastani et al. (2025) motivate separating assisted performance from later unaided performance. The present correctness-only practice route makes that distinction visible, but repeated answers and self-selection mean it is not a controlled post-test. A future approved study would need appropriate recruitment, prior-knowledge measurement, assignment and scoring, with time, effort and uncertainty reported. Small samples would limit conclusions. Because the two conditions change both attempt requirement and release sequence, their effects could not be separated. No learning improvement, equivalence or retention benefit is claimed.
 
@@ -52,7 +52,7 @@ OpenAI Codex assisted with implementation, tests, evidence capture, literature c
 
 ## Repository and submitted version
 
-Local review release: a2-review-v2. Public repository and direct README URLs are pending GitHub connection and publication.
+Local review release: a2-review-v3. GitHub account connected; repository creation, publication and public README links pending.
 
 ## References
 

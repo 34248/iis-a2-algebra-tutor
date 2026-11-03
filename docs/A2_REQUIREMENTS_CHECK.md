@@ -5,11 +5,11 @@ Source: [Canvas A2 assignment](https://canvas.bham.ac.uk/courses/90253/assignmen
 | Requirement | Evidence | Status |
 | --- | --- | --- |
 | Develop the A1 idea and explain design choices | Report pages 1–2; six research sources and course concepts | Included |
-| Abstract at most 300; main text at most 1100 | Abstract 118, main 1049; combined 1167 in formatted report | Within both limits |
+| Abstract at most 300; main text at most 1100 | Abstract 118, main 1048; combined 1166 in formatted report | Within both limits |
 | Architecture with implementation status | Page 2; docs/figures/architecture.svg and .png | Included; fixed-response boundary marked simulated |
 | Two or three illustrated interactions | Page 3; three storyboards and six actual UI captures in evidence/ | Included |
 | Explain development and AI assistance | Page 4; README; docs/DEVELOPMENT.md and PROVENANCE.md | Included; Codex assistance declared |
-| Public repository and README links, identifiable version | Local tag a2-review-v2; accompanying Git bundle | PUBLIC LINKS PENDING GitHub connection and publication |
+| Public repository and README links, identifiable version | Local tag a2-review-v3; accompanying Git bundle | PUBLIC LINKS PENDING repository creation and publication |
 | README word count, setup and limits | README first paragraphs and run instructions | Included |
 | Review choices and take responsibility | Student runs the prototype and reviews report | PENDING student review |
 

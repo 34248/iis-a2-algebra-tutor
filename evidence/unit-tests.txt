@@ -1,4 +1,4 @@
-Codex-run developer checks; not participant data.
+Codex-run software checks; not participant observations.
 
 test_attempt_unlocks_one_step_at_a_time (test_app.TutorChecks.test_attempt_unlocks_one_step_at_a_time) ... ok
 test_baseline_reproduces_problem_before_retest (test_app.TutorChecks.test_baseline_reproduces_problem_before_retest) ... ok
@@ -13,6 +13,15 @@ test_sessions_do_not_share_progress (test_app.TutorChecks.test_sessions_do_not_s
 test_unassisted_problems_have_no_hint_output (test_app.TutorChecks.test_unassisted_problems_have_no_hint_output) ... ok
 test_unavailable_keeps_existing_progress (test_app.TutorChecks.test_unavailable_keeps_existing_progress) ... ok
 test_unsupported_equation_is_not_solved (test_app.TutorChecks.test_unsupported_equation_is_not_solved) ... ok
+test_action_state_and_trace_recording_are_atomic (test_reliability.ReliabilityChecks.test_action_state_and_trace_recording_are_atomic) ... ok
+test_declined_response_does_not_release_checked_steps (test_reliability.ReliabilityChecks.test_declined_response_does_not_release_checked_steps) ... ok
+test_default_context_logging_omits_free_text (test_reliability.ReliabilityChecks.test_default_context_logging_omits_free_text) ... ok
+test_equivalent_numeric_forms_are_checked_consistently (test_reliability.ReliabilityChecks.test_equivalent_numeric_forms_are_checked_consistently) ... ok
+test_free_text_reply_cannot_bypass_the_step_boundary (test_reliability.ReliabilityChecks.test_free_text_reply_cannot_bypass_the_step_boundary) ... ok
+test_invalid_unassisted_input_is_not_scored_as_wrong (test_reliability.ReliabilityChecks.test_invalid_unassisted_input_is_not_scored_as_wrong) ... ok
+test_malformed_reply_or_status_does_not_release_checked_steps (test_reliability.ReliabilityChecks.test_malformed_reply_or_status_does_not_release_checked_steps) ... ok
+test_practice_format_feedback_does_not_supply_the_answer (test_reliability.ReliabilityChecks.test_practice_format_feedback_does_not_supply_the_answer) ... ok
+test_response_exception_preserves_progress_and_allows_retry (test_reliability.ReliabilityChecks.test_response_exception_preserves_progress_and_allows_retry) ... ok
 test_disk_error_keeps_practice_usable_and_reports_export_status (test_trace.TraceChecks.test_disk_error_keeps_practice_usable_and_reports_export_status) ... ok
 test_export_contains_actions_not_free_text_or_session_tokens (test_trace.TraceChecks.test_export_contains_actions_not_free_text_or_session_tokens) ... ok
 test_invalid_hint_is_recorded_as_no_step_release (test_trace.TraceChecks.test_invalid_hint_is_recorded_as_no_step_release) ... ok
@@ -20,6 +29,6 @@ test_trace_export_is_scoped_to_each_session (test_trace.TraceChecks.test_trace_e
 test_unknown_export_refuses (test_trace.TraceChecks.test_unknown_export_refuses) ... ok
 
 ----------------------------------------------------------------------
-Ran 18 tests in 0.097s
+Ran 27 tests in 0.321s
 
 OK

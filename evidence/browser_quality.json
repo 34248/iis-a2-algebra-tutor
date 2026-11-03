@@ -1,0 +1,13 @@
+{
+  "run_kind": "developer_check",
+  "checked_at_utc": "2026-11-03T11:24:05.648Z",
+  "participant_study": false,
+  "passed": true,
+  "fault_injection": "Trace path is an existing file, preventing local directory writes.",
+  "checks": [
+    "Invalid input is distinct from an incorrect answer",
+    "Neutral format feedback and exact spaced fractions",
+    "Actual CSV download despite reported local write failure",
+    "Delayed feedback does not grade subsequently edited answers"
+  ]
+}

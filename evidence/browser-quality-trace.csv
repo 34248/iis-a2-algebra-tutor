@@ -1,0 +1,5 @@
+﻿trace_id,run_kind,timestamp_utc,elapsed_ms,event,practice_problem,condition,version,status,shown_steps,attempt_count,transfer_problem,correct
+001082a73e9af679,developer_check,2026-11-03T11:24:04.460922+00:00,0,start,A01,gradual,revised,ready,0,0,,
+001082a73e9af679,developer_check,2026-11-03T11:24:04.751827+00:00,297,unassisted_invalid,A01,gradual,revised,ready,0,0,T01,
+001082a73e9af679,developer_check,2026-11-03T11:24:04.838185+00:00,391,check,A01,gradual,revised,ready,0,0,,
+001082a73e9af679,developer_check,2026-11-03T11:24:04.933036+00:00,485,check,A01,gradual,revised,ready,0,0,,

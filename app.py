@@ -1,160 +1,327 @@
-"""Local AI tutoring interface prototype. Python standard library only."""
-import argparse,copy,json,re,secrets,threading
-from pathlib import Path
-from fractions import Fraction
-from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
+"""Local fixed-content algebra tutor. Python standard library only."""
+import argparse
+import copy
+import json
+import logging
+import re
+import secrets
 import sys
-sys.path.insert(0,str(Path(__file__).resolve().parent))
+import threading
+from fractions import Fraction
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from urllib.parse import urlsplit
+
+# The prepared standalone runtime does not automatically add this directory.
+ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT))
 import model
 import telemetry
-ROOT=Path(__file__).resolve().parent
-PROBLEMS={p['id']:p for p in json.loads((ROOT/'problems.json').read_text(encoding='utf-8'))}
-SESSIONS={};LOCK=threading.RLock()
-TRANSFER={'T01':{'question':'4x + 1 = 13','answer':3},'T02':{'question':'5x - 2 = 18','answer':4}}
-lab4=None
-class UserError(ValueError):pass
+
+LOGGER = logging.getLogger(__name__)
+PROBLEMS = {item['id']: item for item in json.loads(
+    (ROOT / 'problems.json').read_text(encoding='utf-8'))}
+TRANSFER = {
+    'T01': {'question': '4x + 1 = 13', 'answer': 3},
+    'T02': {'question': '5x - 2 = 18', 'answer': 4},
+}
+SESSIONS = {}
+LOCK = threading.RLock()
+NUMBER = r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)'
+ANSWER_PATTERN = re.compile(
+    rf'(?:x\s*=\s*)?({NUMBER})(?:\s*/\s*({NUMBER}))?', re.IGNORECASE)
+ANSWER_FORMAT = 'Enter a number or fraction, optionally starting with x =.'
+CHECKED_REPLY = ('Checked steps are shown below. '
+                 'This is a fixed-content tutor simulation.')
+
+
+class UserError(ValueError):
+    """Input that the interface can explain without a server error."""
+
 
 def log_context(parts):
-    for part in parts:print('CONTEXT:',json.dumps(part,ensure_ascii=False),flush=True)
+    """Keep free-text attempts and checked solutions out of terminal logs."""
+    LOGGER.debug('Tutor context roles: %s', [part.get('role') for part in parts])
 
-def norm(s):return re.sub(r'\s+','',s.lower().replace('−','-').replace('×','*'))
-def text(value,label,limit=500):
-    if not isinstance(value,str) or not value.strip() or len(value)>limit:raise UserError(label+' must contain 1 to '+str(limit)+' characters.')
+
+def norm(value):
+    return re.sub(r'\s+', '', value.lower().replace('−', '-').replace('×', '*'))
+
+
+def text(value, label, limit=500):
+    if not isinstance(value, str) or not value.strip() or len(value) > limit:
+        raise UserError(f'{label} must contain 1 to {limit} characters.')
     return value.strip()
-def public(s,reply=''):
-    p=PROBLEMS[s['problem_id']]
-    return {'session':s['session'],'problem_id':p['id'],'question_received':s['question'],'condition':s['condition'],
-            'version':s['version'],'status':s['status'],'reply':reply or s.get('reply',''),
-            'steps':copy.deepcopy(s['steps']),'shown':len(s['steps']),'total_steps':len(p['steps']),
-            'attempt_count':len(s['attempts']),'events':copy.deepcopy(s['events']),
-            'next_hint_allowed':s['status']=='ready' and len(s['attempts'])>0 and len(s['steps'])<len(p['steps']),
-            'simulated':True}
-def run_model(s,count):
-    p=PROBLEMS[s['problem_id']]
-    parts=[{'role':'system','content':'Offline tutor simulation. Return only the requested prefix of the fixed checked solution; never invent missing problem content.'},
-           {'role':'tool','name':'checked_problem_state','content':json.dumps({'problem':p,'condition':s['condition'],'reveal_count':count,'attempts':s['attempts']})},
-           {'role':'user','content':s['question']}]
+
+
+def parse_answer(value):
+    """Parse numbers and fractions exactly, without evaluating expressions."""
+    match = ANSWER_PATTERN.fullmatch(text(value, 'Answer'))
+    if not match:
+        raise UserError(ANSWER_FORMAT)
+    try:
+        numerator = Fraction(match.group(1))
+        denominator = Fraction(match.group(2)) if match.group(2) else Fraction(1)
+        return numerator / denominator
+    except (ValueError, ZeroDivisionError):
+        raise UserError('Enter a valid number or fraction with a nonzero denominator.') from None
+
+
+def session_for(payload):
+    identifier = payload.get('session')
+    state = SESSIONS.get(identifier) if isinstance(identifier, str) else None
+    if state is None:
+        raise UserError('Start a new practice session first.')
+    return state
+
+
+def public(state, reply=''):
+    problem = PROBLEMS[state['problem_id']]
+    return {
+        'session': state['session'], 'problem_id': problem['id'],
+        'question_received': state['question'], 'condition': state['condition'],
+        'version': state['version'], 'status': state['status'],
+        'reply': reply or state['reply'], 'steps': copy.deepcopy(state['steps']),
+        'shown': len(state['steps']), 'total_steps': len(problem['steps']),
+        'attempt_count': len(state['attempts']),
+        'events': copy.deepcopy(state['events']),
+        'next_hint_allowed': (state['status'] == 'ready' and
+                              bool(state['attempts']) and
+                              len(state['steps']) < len(problem['steps'])),
+        'simulated': True,
+    }
+
+
+def run_model(state, count):
+    problem = PROBLEMS[state['problem_id']]
+    parts = [
+        {'role': 'system', 'content': (
+            'Offline tutor simulation. Return only the requested prefix of the '
+            'fixed checked solution; never invent missing problem content.')},
+        {'role': 'tool', 'name': 'checked_problem_state', 'content': json.dumps({
+            'problem': problem, 'condition': state['condition'],
+            'reveal_count': count, 'attempts': state['attempts']})},
+        {'role': 'user', 'content': state['question']},
+    ]
     log_context(parts)
-    data=model.call_json(parts,model.SCHEMA)
-    if not isinstance(data,dict) or not all(k in data for k in model.SCHEMA['required']) or data['steps']!=p['steps'][:count]:
-        s['reply']='Tutor output was invalid. No additional steps were released; retry or ask a tutor.'
-        return public(s)
-    s['steps']=data['steps'];s['reply']=data['reply'];return public(s)
+    try:
+        data = model.call_json(parts, model.SCHEMA)
+    except Exception:
+        # A failure at the response boundary must not advance tutoring state.
+        state['reply'] = ('Tutor analysis is unavailable. Your progress is '
+                          'unchanged. Retry when available.')
+        return public(state)
+
+    valid = (
+        isinstance(data, dict) and
+        data.get('accepted') is True and data.get('simulated') is True and
+        isinstance(data.get('reply'), str) and bool(data['reply'].strip()) and
+        isinstance(data.get('steps'), list) and
+        data['steps'] == problem['steps'][:count]
+    )
+    if not valid:
+        state['reply'] = ('Tutor output was invalid. No additional steps were '
+                          'released; retry or ask a tutor.')
+        return public(state)
+    state['steps'] = copy.deepcopy(data['steps'])
+    # Validate the frame, but display a controller-owned acknowledgement: a
+    # free-text reply must not bypass the checked-step release boundary.
+    state['reply'] = CHECKED_REPLY
+    return public(state)
+
 
 def _start(payload):
-    pid=payload.get('problem_id');condition=payload.get('condition','gradual');version=payload.get('version','revised')
-    if pid not in PROBLEMS or condition not in {'gradual','immediate'} or version not in {'baseline','revised'}:raise UserError('Choose a listed problem, condition and version.')
-    q=text(payload.get('question'),'Equation')
-    s={'session':secrets.token_urlsafe(24),'problem_id':pid,'question':q,'condition':condition,'version':version,
-       'status':'ready','steps':[],'attempts':[],'events':[],'reply':''}
-    with LOCK:
-        SESSIONS[s['session']]=s
-        if version=='revised' and norm(q)!=norm(PROBLEMS[pid]['question']):
-            s['status']='blocked';s['reply']='Equation is incomplete or does not match the selected checked problem. Correct it and start again. No solution has been guessed.'
-            s['events'].append('Input validation blocked a mismatched equation.')
-            return public(s)
-        if version=='baseline' and norm(q)!=norm(PROBLEMS[pid]['question']):
-            s['events'].append('INTENTIONAL BASELINE FAILURE: ignored the entered equation and used the selected exercise.')
-            data=run_model(s,len(PROBLEMS[pid]['steps']));s['reply']='Known baseline error: assumed the selected exercise and disclosed its full solution despite incomplete input.';return public(s)
-        if payload.get('unavailable') is True:
-            s['reply']='Tutor analysis is unavailable. No steps were released. Retry after unchecking the unavailable option.'
-            return public(s)
-        if condition=='immediate':return run_model(s,len(PROBLEMS[pid]['steps']))
-        s['reply']='Try a step first. Your attempt unlocks the first hint; it is recorded, not automatically graded.'
-        return public(s)
+    pid = payload.get('problem_id')
+    condition = payload.get('condition', 'gradual')
+    version = payload.get('version', 'revised')
+    if (not isinstance(pid, str) or pid not in PROBLEMS or
+            not isinstance(condition, str) or condition not in {'gradual', 'immediate'} or
+            not isinstance(version, str) or version not in {'baseline', 'revised'}):
+        raise UserError('Choose a listed problem, condition and version.')
+    question = text(payload.get('question'), 'Equation')
+    state = {
+        'session': secrets.token_urlsafe(24), 'problem_id': pid,
+        'question': question, 'condition': condition, 'version': version,
+        'status': 'ready', 'steps': [], 'attempts': [], 'events': [], 'reply': '',
+    }
+    SESSIONS[state['session']] = state
+    mismatch = norm(question) != norm(PROBLEMS[pid]['question'])
+    if version == 'revised' and mismatch:
+        state['status'] = 'blocked'
+        state['reply'] = ('Equation is incomplete or does not match the selected '
+                          'checked problem. Correct it and start again. No solution '
+                          'has been guessed.')
+        state['events'].append('Input validation blocked a mismatched equation.')
+        return public(state)
+    if version == 'baseline' and mismatch:
+        state['events'].append('INTENTIONAL BASELINE FAILURE: ignored the '
+                               'entered equation and used the selected exercise.')
+        run_model(state, len(PROBLEMS[pid]['steps']))
+        if state['steps'] != PROBLEMS[pid]['steps']:
+            return public(state)
+        state['reply'] = ('Known baseline error: assumed the selected exercise and '
+                          'disclosed its full solution despite incomplete input.')
+        return public(state)
+    if payload.get('unavailable') is True:
+        state['reply'] = ('Tutor analysis is unavailable. No steps were released. '
+                          'Retry after unchecking the unavailable option.')
+        return public(state)
+    if condition == 'immediate':
+        return run_model(state, len(PROBLEMS[pid]['steps']))
+    state['reply'] = ('Try a step first. Your attempt unlocks the first hint; '
+                      'it is recorded, not automatically graded.')
+    return public(state)
+
 
 def _action(payload):
-    with LOCK:
-        s=SESSIONS.get(payload.get('session'))
-        if not s:raise UserError('Start a new practice session first.')
-        verb=payload.get('action')
-        if s['status']!='ready':raise UserError('Correct the equation and start again before requesting help.')
-        if verb=='attempt':
-            attempt=text(payload.get('attempt'),'Attempt');s['attempts'].append(attempt);s['events'].append('Attempt recorded; not automatically graded.')
-            s['reply']='Attempt recorded. Select Next hint when you want one checked step.'
-        elif verb=='hint':
-            if payload.get('unavailable') is True:return public(s,'Tutor analysis is unavailable. Your progress is unchanged. Retry when available.')
-            if s['condition']!='gradual':return public(s,'All checked steps are already visible in immediate mode.')
-            if not s['attempts']:return public(s,'Enter an attempt before requesting a hint. No steps were released.')
-            s['events'].append('Requested one next hint.')
-            return run_model(s,min(len(s['steps'])+1,len(PROBLEMS[s['problem_id']]['steps'])))
-        elif verb=='check':
-            value=text(payload.get('answer'),'Answer')
-            match=re.fullmatch(r'(?:x\s*=\s*)?([+-]?\d+(?:\.\d+)?(?:/[+-]?\d+)?)',value,re.I)
-            if not match:return public(s,'Enter a numeric answer, for example x = 4 or 4. No steps were released.')
-            try:correct=Fraction(match.group(1))==PROBLEMS[s['problem_id']]['answer']
-            except (ValueError,ZeroDivisionError):return public(s,'Enter a valid number. No steps were released.')
-            s['events'].append('Checked final numeric answer: '+str(correct))
-            return public(s,'Correct final answer for this checked problem.' if correct else 'That final answer does not match this problem. Check your own working or request the next available hint.')
-        else:raise UserError('Unknown tutor action.')
-        return public(s)
+    state = session_for(payload)
+    if state['status'] != 'ready':
+        raise UserError('Correct the equation and start again before requesting help.')
+    verb = payload.get('action')
+    if verb == 'attempt':
+        state['attempts'].append(text(payload.get('attempt'), 'Attempt'))
+        state['events'].append('Attempt recorded; not automatically graded.')
+        state['reply'] = 'Attempt recorded. Select Next hint when you want one checked step.'
+    elif verb == 'hint':
+        if payload.get('unavailable') is True:
+            return public(state, 'Tutor analysis is unavailable. Your progress is '
+                          'unchanged. Retry when available.')
+        if state['condition'] != 'gradual':
+            return public(state, 'All checked steps are already visible in immediate mode.')
+        if not state['attempts']:
+            return public(state, 'Enter an attempt before requesting a hint. No steps were released.')
+        state['events'].append('Requested one next hint.')
+        return run_model(state, min(len(state['steps']) + 1,
+                                    len(PROBLEMS[state['problem_id']]['steps'])))
+    elif verb == 'check':
+        try:
+            answer = parse_answer(payload.get('answer'))
+        except UserError as error:
+            return public(state, str(error) + ' No steps were released.')
+        correct = answer == PROBLEMS[state['problem_id']]['answer']
+        state['events'].append('Checked final numeric answer: ' + str(correct))
+        return public(state, 'Correct final answer for this checked problem.' if correct else
+                      'That final answer does not match this problem. Check your own '
+                      'working or request the next available hint.')
+    else:
+        raise UserError('Unknown tutor action.')
+    return public(state)
+
 
 def _transfer(payload):
-    pid=payload.get('problem_id');answer=text(payload.get('answer'),'Answer')
-    if pid not in TRANSFER:raise UserError('Choose a listed unassisted problem.')
-    m=re.fullmatch(r'(?:x\s*=\s*)?([+-]?\d+(?:\.\d+)?(?:/[+-]?\d+)?)',answer,re.I)
-    try:correct=bool(m) and Fraction(m.group(1))==TRANSFER[pid]['answer']
-    except (ValueError,ZeroDivisionError):correct=False
-    return {'reply':'Correct.' if correct else 'Not correct; try again without help.','correct':correct,'steps':[],
-            'note':'Self-practice only. No research participant study or learning-effect claim.'}
+    pid = payload.get('problem_id')
+    if not isinstance(pid, str) or pid not in TRANSFER:
+        raise UserError('Choose a listed unassisted problem.')
+    result = {'steps': [], 'note': 'Self-practice only. No research participant '
+              'study or learning-effect claim.'}
+    try:
+        answer = parse_answer(payload.get('answer'))
+    except UserError as error:
+        return {**result, 'reply': str(error), 'correct': None, 'valid': False}
+    correct = answer == TRANSFER[pid]['answer']
+    return {**result, 'reply': 'Correct.' if correct else 'Not correct; try again without help.',
+            'correct': correct, 'valid': True}
 
 
-def record_result(data,event):
-    s=SESSIONS.get(data.get('session'))
-    if s:
-        telemetry.record(s,event)
+def record_result(data, event):
+    telemetry.record(session_for(data), event)
     return data
+
 
 def start(payload):
-    return record_result(_start(payload),'start')
+    # State change, response snapshot and trace belong to the same operation.
+    with LOCK:
+        return record_result(_start(payload), 'start')
+
 
 def action(payload):
-    return record_result(_action(payload),payload.get('action','unknown'))
+    with LOCK:
+        return record_result(_action(payload), payload.get('action', 'unknown'))
+
 
 def transfer(payload):
-    data=_transfer(payload)
-    s=SESSIONS.get(payload.get('session'))
-    if s:telemetry.record(s,'unassisted_check',transfer_problem=payload.get('problem_id'),correct=data['correct'])
-    return data
+    with LOCK:
+        state = session_for(payload) if payload.get('session') is not None else None
+        data = _transfer(payload)
+        if state is not None:
+            telemetry.record(state, 'unassisted_check' if data['valid'] else
+                             'unassisted_invalid', transfer_problem=payload['problem_id'],
+                             correct=data['correct'])
+        return data
+
 
 def export_trace(payload):
-    s=SESSIONS.get(payload.get('session'))
-    if not s:raise UserError('Start a practice session before exporting its trace.')
-    return telemetry.export(s)
+    with LOCK:
+        return telemetry.export(session_for(payload))
+
 
 class Handler(BaseHTTPRequestHandler):
-    def respond(self,data,status=200):
-        body=json.dumps(data).encode();self.send_response(status);self.send_header('Content-Type','application/json; charset=utf-8');self.send_header('Content-Length',str(len(body)));self.send_header('Cache-Control','no-store');self.end_headers();self.wfile.write(body)
+    def respond(self, data, status=200):
+        self.send_body(json.dumps(data).encode(), 'application/json; charset=utf-8', status)
+
+    def send_body(self, body, content_type, status=200):
+        self.send_response(status)
+        self.send_header('Content-Type', content_type)
+        self.send_header('Content-Length', str(len(body)))
+        self.send_header('Cache-Control', 'no-store')
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_GET(self):
-        if self.path=='/api/config':return self.respond({'lab4':lab4 is not None,'problems':[{'id':p['id'],'question':p['question']} for p in PROBLEMS.values()],
-            'transfer':[{'id':k,'question':v['question']} for k,v in TRANSFER.items()]})
-        if self.path in ['/','/index.html']:path=ROOT/'index.html';ctype='text/html; charset=utf-8'
-        elif self.path in ['/sample_images/sample_poster.png','/sample_images/sample_noticeboard.png'] and lab4:
-            path=ROOT/self.path.lstrip('/');ctype='image/png'
-        else:return self.respond({'error':'Not found'},404)
-        body=path.read_bytes();self.send_response(200);self.send_header('Content-Type',ctype);self.send_header('Content-Length',str(len(body)));self.end_headers();self.wfile.write(body)
+        route = urlsplit(self.path).path
+        if route == '/api/config':
+            return self.respond({
+                'lab4': False,
+                'problems': [{'id': p['id'], 'question': p['question']}
+                             for p in PROBLEMS.values()],
+                'transfer': [{'id': pid, 'question': p['question']}
+                             for pid, p in TRANSFER.items()],
+            })
+        assets = {
+            '/': ('index.html', 'text/html; charset=utf-8'),
+            '/index.html': ('index.html', 'text/html; charset=utf-8'),
+            '/client.js': ('client.js', 'text/javascript; charset=utf-8'),
+        }
+        if route not in assets:
+            return self.respond({'error': 'Not found'}, 404)
+        filename, content_type = assets[route]
+        self.send_body((ROOT / filename).read_bytes(), content_type)
+
     def do_POST(self):
         try:
-            origin=self.headers.get('Origin');port=self.server.server_port
-            if origin and origin not in {f'http://127.0.0.1:{port}',f'http://localhost:{port}'}:return self.respond({'error':'Use the local app origin.'},403)
-            length=int(self.headers.get('Content-Length',0))
-            if not 0<length<=20000:raise UserError('Invalid request size.')
-            payload=json.loads(self.rfile.read(length))
-            if not isinstance(payload,dict):raise UserError('A JSON object is required.')
-            if self.path=='/api/start':data=start(payload)
-            elif self.path=='/api/action':data=action(payload)
-            elif self.path=='/api/transfer':data=transfer(payload)
-            elif self.path=='/api/export':data=export_trace(payload)
-            else:return self.respond({'error':'Not found'},404)
-            return self.respond(data)
-        except (UserError,ValueError,KeyError,TypeError) as exc:return self.respond({'error':str(exc)},400)
+            origin = self.headers.get('Origin')
+            port = self.server.server_port
+            if origin and origin not in {f'http://127.0.0.1:{port}', f'http://localhost:{port}'}:
+                return self.respond({'error': 'Use the local app origin.'}, 403)
+            length = int(self.headers.get('Content-Length', 0))
+            if not 0 < length <= 20000:
+                raise UserError('Invalid request size.')
+            payload = json.loads(self.rfile.read(length))
+            if not isinstance(payload, dict):
+                raise UserError('A JSON object is required.')
+            actions = {'/api/start': start, '/api/action': action,
+                       '/api/transfer': transfer, '/api/export': export_trace}
+            handler = actions.get(urlsplit(self.path).path)
+            if handler is None:
+                return self.respond({'error': 'Not found'}, 404)
+            return self.respond(handler(payload))
+        except (UserError, ValueError, KeyError, TypeError) as error:
+            return self.respond({'error': str(error)}, 400)
         except Exception:
-            return self.respond({'error':'The local service could not complete this request. No success is claimed; retry or inspect the terminal.'},500)
-if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--port',type=int,default=8000);args=parser.parse_args()
-    server=ThreadingHTTPServer(('127.0.0.1',args.port),Handler)
-    print('AI tutoring prototype: http://127.0.0.1:'+str(server.server_port),flush=True)
-    print('Offline fixed-content simulation; no participant study, live AI or external account.',flush=True)
-    try:server.serve_forever()
-    except KeyboardInterrupt:pass
-    finally:server.server_close()
+            return self.respond({'error': 'The local service could not complete this '
+                                 'request. Retry or inspect the terminal.'}, 500)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--port', type=int, default=8000)
+    args = parser.parse_args()
+    server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
+    print(f'AI tutoring prototype: http://127.0.0.1:{server.server_port}', flush=True)
+    print('Offline fixed-content simulation; no participant study, live AI or external account.', flush=True)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()

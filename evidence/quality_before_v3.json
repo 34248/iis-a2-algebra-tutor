@@ -1,0 +1,8 @@
+{
+  "run_kind": "developer_check",
+  "role": "Pre-fix regression summary, not current passing results",
+  "version": "a2-review-v2",
+  "methods_run_before_fix": 8,
+  "observed": "Eight initial methods exposed failures or errors. Subtests covered malformed numeric inputs and response fields. Raw diagnostic output is retained locally outside the publication package.",
+  "participant_study": false
+}
