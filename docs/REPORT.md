@@ -1,6 +1,6 @@
 # Controlled Help in an Algebra Tutoring Prototype
 
-Formatted Word/PDF count: 1129 total; abstract 118; main text 1011 including headings, AI acknowledgement and repository status. Figure labels/captions and references excluded.
+Formatted Word/PDF count: 1167 total; abstract 118; main text 1049 including headings, AI acknowledgement and repository status. Figure labels/captions and references excluded.
 
 ## Abstract
 
@@ -12,7 +12,6 @@ Completing an equation with assistance does not establish that a learner can sol
 
 The starting point was the A1-aligned Lab4 project, created after the earlier email exercise. A2 retains its tutor path and removes the unrelated course-policy retrieval, scheduling and recorded-image exercises from this focused package. That change keeps the design argument about algebra assistance. Source-file fingerprints and the original Lab4 commit are recorded in docs/PROVENANCE.md; the original lab remains separate.
 
-
 ## Design choices and supporting evidence
 
 Gradual mode requires a nonempty attempt before the first requested hint. Each subsequent request reveals one more checked step; immediate mode displays the same steps together. This preserves the combined comparison proposed in A1. Atkinson, Renkl and Merrill (2003) found transfer benefits from fading worked steps combined with self-explanation prompts, but their intervention does not establish the effect of this interface. Sale and Muldner (2019) found no significant overall learning difference between their hint conditions. These results support testing the choice without assuming that less assistance must improve learning.
@@ -23,13 +22,19 @@ Scope disclosure and recovery follow Amershi et al.’s (2019) guidelines on cap
 
 Kim et al. (2009) reported an interaction between tutorial method and conceptual versus procedural knowledge. This informs the distinction between checking a numeric answer and checking understanding of a step. The prototype implements the first. A future explanation task would need a scoring rubric and appropriate checking before its scores could be compared. Keeping that boundary explicit avoids treating a correct number, possibly obtained after repeated attempts, as a complete measure of understanding.
 
-
 ## Architecture and illustrated interaction
 
-Figure 1 shows the implemented boundaries. The browser sends the selected equation, condition and action to a local Python controller. The controller holds session state and supplies only the requested reveal count to the offline response function. That function returns a prefix of problems.json. The controller checks the returned prefix against the checked content before display. Unexpected output releases no additional step. This applies Week 3’s distinction between model instructions, supplied data and the application’s enforcement of an interaction contract (University of Birmingham, 2026).
+Figure 1 shows the implemented boundaries. The browser sends the selected equation, condition and action to a local Python controller. The controller holds session state and passes checked problem data and the permitted reveal count to the offline response function. That function returns the corresponding prefix of the item's stored solution steps. The controller checks the returned prefix against the checked content before display. Unexpected output releases no additional step. This applies Week 3’s distinction between model instructions, supplied data and the application’s enforcement of an interaction contract (University of Birmingham, 2026).
 
 Example 1 contrasts a recorded attempt followed by one requested hint with the complete immediate solution. Example 2 shows the incomplete input being blocked and a corrected equation restarting successfully. Example 3 checks a new equation without revealing worked steps, then exports the interaction trace. Numeric correctness checks use exact rational arithmetic. They do not score conceptual explanations. An injected unavailable response retains earlier steps and reports the interruption, allowing inspection of recovery without pretending that a successful new answer arrived.
 
+![System architecture](figures/architecture.png)
+
+![Interaction example 1](figures/story-1.png)
+
+![Interaction example 2](figures/story-2.png)
+
+![Interaction example 3](figures/story-3.png)
 
 ## Development evidence and limits
 
@@ -37,7 +42,7 @@ The A2 extension adds a session trace containing timestamps, elapsed time, condi
 
 The timer begins when a practice session first records an event. It therefore excludes setup time and cannot establish total task effort. Restarting creates a different trace rather than silently appending a second condition. No automatic group allocation, participant consent workflow or effort questionnaire is implemented. These omissions matter when interpreting exported records: a sequence of successful software actions cannot be reported as an independently administered learning experiment.
 
-The checked version passes 18 automated code tests and 16 browser checks. Evidence includes mode-content equality, refusal of unsupported input, session separation, failed-response handling, mobile layout and actual CSV downloads. Two demonstration CSV files are explicitly labelled developer_demo. These records were produced by Codex automation, not participants. The browser check exposed a restart/input timing problem; moving input clearing before the asynchronous start request prevented newly typed work being erased. A separate check confirms that file-write failure leaves an in-memory export available.
+The checked version passes 18 automated code tests and 18 browser checks. Evidence includes mode-content equality, refusal of unsupported input, session separation, failed-response handling, mobile layout and actual CSV downloads. Two demonstration CSV files are explicitly labelled developer_demo. These records were produced by Codex automation, not participants. The browser check exposed a restart/input timing problem; moving input clearing before the asynchronous start request prevented newly typed work being erased. Further checks found conflicting controls remained available during delayed replies and old feedback survived an unaided-item change. Pending requests now lock conflicting controls; changing the item clears its feedback. File-write failure still leaves in-memory export available.
 
 Bastani et al. (2025) motivate separating assisted performance from later unaided performance. The present correctness-only practice route makes that distinction visible, but repeated answers and self-selection mean it is not a controlled post-test. A future approved study would need appropriate recruitment, prior-knowledge measurement, assignment and scoring, with time, effort and uncertainty reported. Small samples would limit conclusions. Because the two conditions change both attempt requirement and release sequence, their effects could not be separated. No learning improvement, equivalence or retention benefit is claimed.
 
@@ -47,7 +52,7 @@ OpenAI Codex assisted with implementation, tests, evidence capture, literature c
 
 ## Repository and submitted version
 
-Public repository and README URLs pending GitHub connection and publication.
+Local review release: a2-review-v2. Public repository and direct README URLs are pending GitHub connection and publication.
 
 ## References
 

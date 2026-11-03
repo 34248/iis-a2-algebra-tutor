@@ -1,6 +1,6 @@
 # Controlled algebra tutoring
 
-README prose word count: 655. Code and setup commands excluded.
+README prose word count: 700. Code and setup commands excluded.
 
 An IIS A2 prototype comparing attempt-first gradual help with an immediate worked solution. Both modes use identical checked content. Python 3.12 or later, standard library only.
 
@@ -26,21 +26,22 @@ evidence/developer-demo*.csv are assistant-run demonstrations, labelled develope
 ```text
 python -m unittest discover -v
 ```
-The checked A2 version has 18 passing code tests and 16 browser checks. Evidence records, screenshots and demonstration exports are in evidence/. Test sessions use isolated temporary trace directories. The browser automation checks real local HTTP requests and actual downloads. No performance or learning benefit is inferred from passing tests.
+The checked A2 version has 18 passing code tests and 18 browser checks (16 interaction checks plus two regressions). Evidence records, screenshots and demonstration exports are in evidence/. The pre-fix evidence file explicitly records the two expected failures on v1; browser_regressions.json records their passing results on v2. Details of the controls and feedback fixes are in docs/DEVELOPMENT.md. Test sessions use isolated temporary trace directories. The browser automation checks real local HTTP requests and actual downloads. No performance or learning benefit is inferred from passing tests.
 
 ## AI assistance and authorship
 OpenAI Codex prepared the earlier Lab4 code and this A2 extension, wrote and ran checks, captured evidence and helped draft the report. The humanizer skill was used for prose review without changing the technical claims. Examples of corrections include the runtime import order, restart/input timing and keeping free-text attempts out of persisted traces. The student needs to inspect the system and take responsibility for the submitted choices. No unaided authorship or participant activity is claimed. Local commits describe assisted development.
 
 ## Report and version
-The report, architecture and interaction figures are in docs/. Local review release: a2-review-v1. The submitted commit and public repository URL must be recorded when published. Repository publication is pending; no working public URL is claimed. Additional local packaging and a Chinese reading guide accompany the report.
+The report, architecture and interaction figures are in docs/. Local review release: a2-review-v2. The submitted commit and public repository URL must be recorded when published. Repository publication is pending; no working public URL is claimed. Additional local packaging and a Chinese reading guide accompany the report.
 
 ## Reproducing browser inspection
-The optional script tools/browser_checks.cjs uses Node.js and Playwright, independently of the standard-library app. Install Playwright and its Chromium browser in a separate tooling environment, then run the script from this directory. Set PYTHON_EXECUTABLE to a Python 3.12 interpreter. BROWSER_EXECUTABLE may select an existing Chromium-family browser. Inspection creates fresh labelled demonstration evidence and uses a temporary trace directory. It does not recruit participants.
+The optional scripts tools/browser_checks.cjs and tools/browser_regressions.cjs use Node.js and Playwright, independently of the standard-library app. Install Playwright and its Chromium browser in a separate tooling environment, then run the script from this directory. Set PYTHON_EXECUTABLE to a Python 3.12 interpreter. BROWSER_EXECUTABLE may select an existing Chromium-family browser. Inspection creates fresh labelled demonstration evidence and uses a temporary trace directory. It does not recruit participants.
 
 ```text
 npm install --no-save playwright
 npx playwright install chromium
 node tools/browser_checks.cjs
+node tools/browser_regressions.cjs
 ```
 
 ## Local review archive
@@ -50,4 +51,4 @@ The accompanying ZIP contains this project, report copies, demonstration evidenc
 git clone evidence/development.bundle iis-a2
 ```
 
-The Chinese guide and docs/A2_REQUIREMENTS_CHECK.md explain review steps and the outstanding public links. The report is a review draft until those links and its submitted version are filled in. No Canvas upload has been made.
+The Chinese guides (including the full paragraph comparison and citation-use explanation) and docs/A2_REQUIREMENTS_CHECK.md explain review steps and the outstanding public links. The report is a review draft until those links and its submitted version are filled in. No Canvas upload has been made.

@@ -1,0 +1,29 @@
+{
+  "run_kind": "developer_check",
+  "participant_study": false,
+  "checks": [
+    {
+      "name": "Pending request locks conflicting controls",
+      "passed": true,
+      "observed": {
+        "start": true,
+        "condition": true,
+        "problem": true,
+        "version": true,
+        "equation": true,
+        "transfer": true,
+        "save-attempt": true,
+        "export-trace": true,
+        "transfer-check": true
+      }
+    },
+    {
+      "name": "Changing unassisted item clears old result and answer",
+      "passed": true,
+      "observed": {
+        "answer": "",
+        "result": "No hints or worked steps will be shown."
+      }
+    }
+  ]
+}

@@ -14,3 +14,10 @@ The independent Python runtime did not discover telemetry.py when it was importe
 
 ## Limits and next work
 Attempts are checked for nonempty text, not mathematical reasoning. The baseline deliberately reveals a selected solution when input is mismatched and is clearly labelled as a defect demonstration. Unaided practice allows retries and is not a secure post-test. A future participant study requires suitable review and its own recruitment, assignment and analysis plan. No study outcome is fabricated.
+
+## Review update on 3 November 2026
+Two additional browser checks were first run on release a2-review-v1. During a delayed hint response, restart, mode selection and other actions remained available. This permitted conflicting requests or a changed setup while an older response was still pending. The unassisted selector also kept the preceding item's answer and Correct message. The observed pre-fix failures are labelled in evidence/regression_before_v2.json.
+
+The interface now disables conflicting setup and action controls while a request is pending, then restores controls from the actual session state. The attempt input remains editable while practice starts. Changing an unassisted item clears its old answer and feedback. The additional checks hold a real local response before it reaches the browser, inspect the disabled controls, then release it; they also check feedback after changing the unassisted item. They are meaningful regressions for displayed session state, not participant observations.
+
+The report names the local review release a2-review-v2. Its Chinese reading companion explains the problem, paragraph purposes, source uses and practical inspection steps. Public repository links and the student's own review are still outstanding. No public upload or Canvas submission occurred during this local update.
