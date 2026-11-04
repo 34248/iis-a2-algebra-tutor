@@ -31,3 +31,13 @@ Response validation now checks accepted/simulated flags, reply type and checked 
 Public start/action/transfer/export calls share a reentrant lock around both state access and trace recording. This keeps event counts consistent when requests overlap. The default context logger omits free text. Browser logic is separated into client.js, and a delayed check cannot attach a Correct message to an answer edited while waiting. The export message distinguishes a browser download from the server copy, including actual disk-write failure.
 
 Validation: 27 code tests and 22 browser checks pass. The extra browser_quality.cjs script starts the real server with a deliberately unusable trace directory, downloads CSV and checks feedback during delayed local responses. These are developer checks, not participant data or a speed benchmark. Source Lab4 files remain unchanged. The local review version is a2-review-v3; no Canvas submission has been made.
+
+
+## Learning workflow and research scope on 4 November 2026
+User review identified that the earlier two-item demonstration was too thin. Added algebra.py, a restricted AST-based linear-expression reducer using exact rational arithmetic. It checks equation equivalence without evaluating submitted code, reveals no worked step on its own and does not grade written explanations. Catalog answers, intermediate equations and substitution checks are validated at startup.
+
+Expanded to nine practice/new-item pairs, including variables on both sides, brackets and fractional coefficients. Replaced the inspection-led page with a learner workspace, persistent working/hints, completion feedback and a paired-item handoff. Demo controls are collapsed; mobile practice moves to the working area after start. Browser feedback still rejects results for an answer edited while checking.
+
+Research review also identified that extra equation feedback could change the A1 comparison. Added a server-enforced session setting that disables it in either mode and records that choice. This supports controlling feedback; it does not implement assignment or a locked research sequence. RESEARCH_PROTOCOL.md distinguishes the implemented mechanism from the pre-test, controlled post-test, conceptual scoring and participant study still needed.
+
+40 code tests and 32 browser checks pass. The new tests verify all eighteen authored questions, exact equation forms, wrong steps, rejected syntax, catalog corruption, completion, fractional/multi-step items, privacy of exported working and comparison controls. Four current workspace screenshots and a labelled learning-demo export accompany the prior evidence. These remain software checks without participant learning outcomes.

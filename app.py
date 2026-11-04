@@ -17,14 +17,14 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 import model
 import telemetry
+import algebra
 
 LOGGER = logging.getLogger(__name__)
 PROBLEMS = {item['id']: item for item in json.loads(
     (ROOT / 'problems.json').read_text(encoding='utf-8'))}
-TRANSFER = {
-    'T01': {'question': '4x + 1 = 13', 'answer': 3},
-    'T02': {'question': '5x - 2 = 18', 'answer': 4},
-}
+TRANSFER = {item['id']: item for item in json.loads(
+    (ROOT / 'transfer.json').read_text(encoding='utf-8'))}
+algebra.validate_catalog(PROBLEMS, TRANSFER)
 SESSIONS = {}
 LOCK = threading.RLock()
 NUMBER = r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)'
@@ -89,6 +89,11 @@ def public(state, reply=''):
                               bool(state['attempts']) and
                               len(state['steps']) < len(problem['steps'])),
         'simulated': True,
+        'step_feedback': copy.deepcopy(state['step_feedback']),
+        'equation_feedback': state['equation_feedback'],
+        'step_checks': state['step_checks'], 'answer_checks': state['answer_checks'],
+        'solved': state['final_correct'] is True,
+        'transfer_id': problem['transfer_id'], 'difficulty': problem['difficulty'],
     }
 
 
@@ -143,6 +148,8 @@ def _start(payload):
         'session': secrets.token_urlsafe(24), 'problem_id': pid,
         'question': question, 'condition': condition, 'version': version,
         'status': 'ready', 'steps': [], 'attempts': [], 'events': [], 'reply': '',
+        'step_feedback': None, 'step_checks': 0, 'answer_checks': 0, 'final_correct': None,
+        'equation_feedback': payload.get('equation_feedback', True) is not False,
     }
     SESSIONS[state['session']] = state
     mismatch = norm(question) != norm(PROBLEMS[pid]['question'])
@@ -179,9 +186,21 @@ def _action(payload):
         raise UserError('Correct the equation and start again before requesting help.')
     verb = payload.get('action')
     if verb == 'attempt':
+        state['step_feedback'] = None
         state['attempts'].append(text(payload.get('attempt'), 'Attempt'))
         state['events'].append('Attempt recorded; not automatically graded.')
         state['reply'] = 'Attempt recorded. Select Next hint when you want one checked step.'
+    elif verb == 'check_step':
+        if not state['equation_feedback']:
+            raise UserError('Equation feedback is disabled for this comparison. Record an attempt or request an available worked step.')
+        proposed = text(payload.get('attempt'), 'Your line of working')
+        feedback = algebra.check_step(PROBLEMS[state['problem_id']]['question'], proposed)
+        state['attempts'].append(proposed)
+        state['step_checks'] += 1
+        state['step_feedback'] = feedback
+        state['reply'] = feedback['reply']
+        result = 'equivalent' if feedback['equivalent'] else 'not equivalent' if feedback['valid'] else 'not checkable'
+        state['events'].append('Equation check: ' + result + '.')
     elif verb == 'hint':
         if payload.get('unavailable') is True:
             return public(state, 'Tutor analysis is unavailable. Your progress is '
@@ -194,11 +213,14 @@ def _action(payload):
         return run_model(state, min(len(state['steps']) + 1,
                                     len(PROBLEMS[state['problem_id']]['steps'])))
     elif verb == 'check':
+        state['final_correct'] = None
         try:
             answer = parse_answer(payload.get('answer'))
         except UserError as error:
             return public(state, str(error) + ' No steps were released.')
-        correct = answer == PROBLEMS[state['problem_id']]['answer']
+        correct = answer == Fraction(str(PROBLEMS[state['problem_id']]['answer']))
+        state['answer_checks'] += 1
+        state['final_correct'] = correct
         state['events'].append('Checked final numeric answer: ' + str(correct))
         return public(state, 'Correct final answer for this checked problem.' if correct else
                       'That final answer does not match this problem. Check your own '
@@ -218,13 +240,15 @@ def _transfer(payload):
         answer = parse_answer(payload.get('answer'))
     except UserError as error:
         return {**result, 'reply': str(error), 'correct': None, 'valid': False}
-    correct = answer == TRANSFER[pid]['answer']
+    correct = answer == Fraction(str(TRANSFER[pid]['answer']))
     return {**result, 'reply': 'Correct.' if correct else 'Not correct; try again without help.',
             'correct': correct, 'valid': True}
 
 
 def record_result(data, event):
-    telemetry.record(session_for(data), event)
+    state = session_for(data)
+    feedback = state['step_feedback'] or {}
+    telemetry.record(state, event, step_equivalent=feedback.get('equivalent') if event == 'check_step' else '')
     return data
 
 
@@ -271,16 +295,17 @@ class Handler(BaseHTTPRequestHandler):
         route = urlsplit(self.path).path
         if route == '/api/config':
             return self.respond({
-                'lab4': False,
-                'problems': [{'id': p['id'], 'question': p['question']}
+                'lab4': False, 'app_id': 'iis-algebra-tutor', 'version': '4',
+                'problems': [{'id': p['id'], 'question': p['question'], 'difficulty': p['difficulty'], 'transfer_id': p['transfer_id']}
                              for p in PROBLEMS.values()],
-                'transfer': [{'id': pid, 'question': p['question']}
+                'transfer': [{'id': pid, 'question': p['question'], 'difficulty': p['difficulty']}
                              for pid, p in TRANSFER.items()],
             })
         assets = {
             '/': ('index.html', 'text/html; charset=utf-8'),
             '/index.html': ('index.html', 'text/html; charset=utf-8'),
             '/client.js': ('client.js', 'text/javascript; charset=utf-8'),
+            '/style.css': ('style.css', 'text/css; charset=utf-8'),
         }
         if route not in assets:
             return self.respond({'error': 'Not found'}, 404)
@@ -315,10 +340,19 @@ class Handler(BaseHTTPRequestHandler):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=8000)
+    parser.add_argument('--open', action='store_true', help='Open the local browser after startup')
     args = parser.parse_args()
-    server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
+    try:
+        server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
+    except OSError:
+        if args.port == 0:
+            raise
+        server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
     print(f'AI tutoring prototype: http://127.0.0.1:{server.server_port}', flush=True)
     print('Offline fixed-content simulation; no participant study, live AI or external account.', flush=True)
+    if args.open:
+        import webbrowser
+        webbrowser.open(f'http://127.0.0.1:{server.server_port}')
     try:
         server.serve_forever()
     except KeyboardInterrupt:

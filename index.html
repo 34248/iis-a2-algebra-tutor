@@ -1,7 +1,76 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Tutoring | Practice before help</title><style>
-:root{--bg:#f6f6f3;--surface:#fff;--sunk:#efeeea;--ink:#1c1f23;--muted:#5f646b;--line:#e4e2dc;--accent:#24634e;--warn:#945800;--warnbg:#fbf1df;color-scheme:light}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,sans-serif}main{max-width:1120px;margin:auto;padding:32px 20px 64px}h1{font-size:32px;line-height:1.15;margin:0 0 12px}h2{font-size:23px;margin:0 0 16px}h3{font-size:18px}p{margin:8px 0}.muted{color:var(--muted)}.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;margin-top:24px;min-width:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.grid>*{min-width:0}label{display:block;margin:12px 0 6px;font-weight:600}select,input,textarea,button{font:inherit;max-width:100%}select,input:not([type=checkbox]),textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}textarea{min-height:85px}button{border:1px solid var(--line);padding:12px 18px;border-radius:8px;background:var(--sunk);color:var(--ink);cursor:pointer}button.primary{background:var(--accent);color:white;border-color:var(--accent)}button:disabled{opacity:.45;cursor:default}.buttons{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}.banner{background:var(--warnbg);color:var(--warn);padding:12px 16px;border-radius:8px}.reply{border-left:4px solid var(--accent);padding:12px 16px;background:var(--sunk);white-space:pre-wrap;overflow-wrap:anywhere}li{margin:8px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}.evidence{padding:12px;border:1px solid var(--line);margin:12px 0;border-radius:8px;overflow-wrap:anywhere}.evidence blockquote{margin:8px 0}.sample{width:100%;max-width:520px;display:block;border:1px solid var(--line);border-radius:8px;margin:12px 0}[hidden]{display:none!important}.check{display:flex;align-items:center;gap:8px;font-weight:400}.check input{width:auto}a{color:var(--accent)}:focus-visible{outline:3px solid var(--accent);outline-offset:3px}@media(max-width:700px){.grid{grid-template-columns:1fr}main{padding:24px 14px}.card{padding:18px}h1{font-size:28px}}@media(prefers-color-scheme:dark){:root{--bg:#121417;--surface:#1a1d21;--sunk:#23272c;--ink:#e7e9ec;--muted:#a3a9b1;--line:#383d44;--accent:#8aa8ff;--warn:#e8b04e;--warnbg:#2e2412;color-scheme:dark}button.primary{color:#10131a}}
-</style></head><body><main><header><p class="muted">IIS A2 · Controlled algebra tutoring</p><h1>Algebra practice with controlled help</h1><p>Compare gradual release with an immediate worked solution, using identical checked steps.</p><p class="banner">Fixed-content prototype supporting two checked practice equations. Tutor responses are simulated; no live language model is connected.</p></header>
-<section class="card"><h2>1. Choose your practice</h2><div class="grid"><div><label for="problem">Checked problem</label><select id="problem"></select><label for="equation">Equation to use</label><input id="equation" value="2x + 3 = 11" autocomplete="off"></div><div><label for="condition">Help presentation</label><select id="condition"><option value="gradual">Attempt first + gradual release</option><option value="immediate">Immediate worked solution</option></select><label for="version">Inspection version</label><select id="version"><option value="revised">Revised: validate incomplete input</option><option value="baseline">Before revision: known input-guessing error</option></select></div></div><label class="check"><input type="checkbox" id="unavailable">Inspector option: unavailable tutor response</label><div class="buttons"><button id="start" class="primary">Start / restart practice</button></div><p class="muted">Restart clears this screen's practice progress. An incomplete equation is a test input; the revised version should ask you to correct it.</p></section>
-<section class="card" id="practice"><h2>2. Try, then request help</h2><p id="progress" class="muted">Start a practice session.</p><p id="reply" class="reply" aria-live="polite">Choose a checked problem above.</p><label for="attempt">Your attempt or explanation</label><textarea id="attempt" placeholder="Describe your own first step or approach."></textarea><div class="buttons"><button id="save-attempt" disabled>Record attempt</button><button id="hint" class="primary" disabled>Next hint</button></div><p class="muted">Attempts unlock help; their reasoning is not automatically graded. The same checked solution text is used in both modes.</p><ol id="steps"></ol><label for="answer">Final answer</label><input id="answer" placeholder="Enter a number or fraction" autocomplete="off"><div class="buttons"><button id="check-answer" disabled>Check final answer</button></div><div class="buttons"><button id="export-trace" disabled>Export this session as CSV</button></div><p class="muted">Technical trace: timestamps, help use and answer checks are saved on this computer. Free-text attempts are not written to the trace. This is not participant research data.</p><p id="export-status" aria-live="polite"></p><details><summary>Practice events</summary><ul id="events"></ul></details></section>
-<section class="card"><h2>3. New problem without help</h2><p class="muted">Self-practice only: hints and worked solutions are unavailable here. This is not a research post-test.</p><label for="transfer">New equation</label><select id="transfer"></select><label for="transfer-answer">Your answer without help</label><input id="transfer-answer" placeholder="x = ..." autocomplete="off"><div class="buttons"><button id="transfer-check">Check unassisted answer</button></div><p id="transfer-result" class="reply" aria-live="polite">No hints or worked steps will be shown.</p></section>
-<p id="error" class="banner" role="alert" hidden></p><footer class="muted"><p>A comparative participant study remains planned. Session traces describe software interactions and cannot establish learning gains. Restarting creates a new session; use Export before changing settings.</p></footer></main><script src="client.js" defer></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Algebra practice | Controlled help</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="client.js" defer></script>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">x</span><span>Algebra practice<span class="brand-sub">IIS project · Learning workspace</span></span></div>
+    <a class="offline" href="#about">Offline tutor <span aria-hidden="true">↗</span></a>
+  </header>
+  <div class="intro"><div><p class="eyebrow">Linear equations · Four difficulty groups</p><h1>Work through the equation.</h1><p class="lead">Try your own line, check it, then choose whether to reveal a worked step.</p></div><p class="catalog-size">9 practice items<br><span>9 new questions without hints</span></p></div>
+  <div class="workspace">
+    <aside class="setup">
+      <section class="card setup-card">
+        <p class="eyebrow">01 / Set up</p><h2>Your practice</h2>
+        <label for="problem">Choose a problem</label><select id="problem" aria-describedby="problem-kind"></select>
+        <p id="problem-kind" class="muted"></p>
+        <label for="condition">How would you like help?</label>
+        <select id="condition"><option value="gradual">Try first · step hints</option><option value="immediate">Full worked example</option></select>
+        <p id="mode-description" class="sub">Your attempt comes first. Reveal one step at a time.</p>
+        <button id="start" class="primary full">Start practice</button>
+        <p class="setup-note">Starting again creates a fresh session. Download your record first if you want to keep it.</p>
+      </section>
+      <details id="inspector" class="card fold"><summary>Demo controls</summary>
+        <label for="equation">Equation sent to the tutor</label><input id="equation" value="2x + 3 = 11" autocomplete="off">
+        <label for="version">Input handling</label><select id="version"><option value="revised">Checked input</option><option value="baseline">Before correction: error demonstration</option></select>
+        <label class="check"><input type="checkbox" id="equation-feedback" checked>Allow equation feedback</label>
+        <p class="sub">For a presentation-only comparison, switch this off in both conditions. Its setting is included in the record.</p>
+        <label class="check"><input type="checkbox" id="unavailable">Simulate a missing response</label>
+        <p class="sub">Inspect incomplete input and recovery here. The error demonstration deliberately ignores an incomplete equation.</p>
+      </details>
+    </aside>
+    <div class="learning">
+      <section class="card practice-card" id="practice">
+        <div class="card-top"><span class="eyebrow">02 / Your working</span><span id="practice-state" class="pill">Ready to start</span></div>
+        <p class="question-label">Solve for x</p><h2 id="current-equation" class="equation">2x + 3 = 11</h2>
+        <p id="progress" class="muted">Choose how you want help, then start.</p>
+        <p id="reply" class="feedback" role="status" aria-live="polite">Your working stays here while you practise.</p>
+        <label for="attempt">Your next equation or explanation</label>
+        <textarea id="attempt" rows="3" placeholder="Write a complete equation to check it, or describe your approach."></textarea>
+        <div class="buttons working-buttons"><button id="check-step" disabled>Check this equation</button><button id="save-attempt" class="quiet" disabled>Record explanation</button></div>
+        <p class="sub">Equation checks compare solutions. Written explanations are recorded without a reasoning score.</p>
+        <p id="step-feedback" class="feedback" role="status" aria-live="polite" hidden></p>
+        <div class="help-area"><div class="help-top"><h3>Worked steps</h3><span id="hint-count" class="muted">0 of 3 shown</span></div>
+          <progress id="hint-progress" max="3" value="0" aria-label="Worked steps visible"></progress>
+          <p id="steps-empty" class="empty">The steps you request will appear here and stay visible.</p>
+          <ol id="steps" class="steps"></ol>
+          <button id="hint" class="primary" disabled>Reveal next step <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="answer-area"><label for="answer">Your final answer</label><div class="answer-row"><input id="answer" placeholder="Enter a number or fraction" autocomplete="off"><button id="check-answer" disabled>Check answer</button></div></div>
+        <section id="completion" class="completion" hidden><h3>Equation solved.</h3><p id="completion-summary"></p><button id="try-independent" class="primary">Try a new question without hints <span aria-hidden="true">→</span></button></section>
+        <div class="record-area"><div><h3>This session</h3><p id="session-facts" class="sub">Start a practice session to create a record.</p></div><button id="export-trace" class="quiet" disabled>Download CSV</button></div>
+        <p id="export-status" class="sub" aria-live="polite"></p>
+        <details class="events"><summary>View practice events</summary><ul id="events"></ul></details>
+      </section>
+      <section class="card independent-card" id="independent">
+        <p class="eyebrow">03 / On your own</p><h2>Try without hints.</h2><p class="lead-small">A different equation. Use what you have just practised.</p>
+        <label for="transfer">Choose a new question</label><select id="transfer"></select>
+        <p id="transfer-equation" class="equation small-equation">4x + 1 = 13</p>
+        <label for="transfer-answer">Your answer without help</label><input id="transfer-answer" placeholder="Enter a number or fraction" autocomplete="off">
+        <button id="transfer-check" class="full">Check independently</button>
+        <p id="transfer-result" class="feedback" role="status" aria-live="polite">No hints or worked steps will be shown.</p>
+        <p class="sub independent-note">You can retry. These practice answers are not a controlled learning assessment.</p>
+      </section>
+    </div>
+  </div>
+  <p id="error" class="error-banner" role="alert" hidden></p>
+  <footer><details id="about"><summary>About this prototype and your records</summary><p>Nine authored practice equations and nine paired questions cover warm-up, signed numbers, fractions and multi-step work. Equation equivalence is checked locally using exact arithmetic. Worked hints come from checked content; the language-model response boundary is simulated and no external AI is connected.</p><p>Operation counts and outcomes can be saved on this computer. Your free-text working and session access tokens are excluded from the saved trace. The software checks and sample CSV files are developer demonstrations. A participant study remains future work.</p></details></footer>
+</main>
+</body>
+</html>

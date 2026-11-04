@@ -1,0 +1,56 @@
+[
+  {
+    "id": "T01",
+    "question": "4x + 1 = 13",
+    "answer": 3,
+    "difficulty": "Warm-up"
+  },
+  {
+    "id": "T02",
+    "question": "5x - 2 = 18",
+    "answer": 4,
+    "difficulty": "Warm-up"
+  },
+  {
+    "id": "T03",
+    "question": "3x + 5 = -7",
+    "answer": -4,
+    "difficulty": "Signed numbers"
+  },
+  {
+    "id": "T04",
+    "question": "-3x + 2 = 17",
+    "answer": -5,
+    "difficulty": "Signed numbers"
+  },
+  {
+    "id": "T05",
+    "question": "4x + 1 = 7",
+    "answer": "3/2",
+    "difficulty": "Fractions"
+  },
+  {
+    "id": "T06",
+    "question": "x / 3 - 1 = 2",
+    "answer": 9,
+    "difficulty": "Fractions"
+  },
+  {
+    "id": "T07",
+    "question": "7x - 4 = 3x + 20",
+    "answer": 6,
+    "difficulty": "Multi-step"
+  },
+  {
+    "id": "T08",
+    "question": "2(x - 3) + 5 = 15",
+    "answer": 8,
+    "difficulty": "Multi-step"
+  },
+  {
+    "id": "T09",
+    "question": "(x - 2)/4 + x/3 = 3",
+    "answer": 6,
+    "difficulty": "Multi-step"
+  }
+]

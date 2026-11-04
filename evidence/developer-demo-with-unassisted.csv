@@ -1,5 +1,5 @@
-﻿trace_id,run_kind,timestamp_utc,elapsed_ms,event,practice_problem,condition,version,status,shown_steps,attempt_count,transfer_problem,correct
-c4cc9be626165edc,developer_demo,2026-11-03T11:24:05.539362+00:00,0,start,A01,gradual,revised,ready,0,0,,
-c4cc9be626165edc,developer_demo,2026-11-03T11:24:05.605289+00:00,79,attempt,A01,gradual,revised,ready,0,1,,
-c4cc9be626165edc,developer_demo,2026-11-03T11:24:05.669566+00:00,141,hint,A01,gradual,revised,ready,1,1,,
-c4cc9be626165edc,developer_demo,2026-11-03T11:24:05.794261+00:00,266,unassisted_check,A01,gradual,revised,ready,1,1,T01,True
+﻿trace_id,run_kind,timestamp_utc,elapsed_ms,event,practice_problem,condition,version,status,shown_steps,attempt_count,transfer_problem,correct,step_checks,step_equivalent,answer_checks,final_correct,equation_feedback
+eef3f38b57c04479,developer_demo,2026-11-04T10:46:06.475617+00:00,0,start,A01,gradual,revised,ready,0,0,,,0,,0,,True
+eef3f38b57c04479,developer_demo,2026-11-04T10:46:06.535889+00:00,62,attempt,A01,gradual,revised,ready,0,1,,,0,,0,,True
+eef3f38b57c04479,developer_demo,2026-11-04T10:46:06.586746+00:00,109,hint,A01,gradual,revised,ready,1,1,,,0,,0,,True
+eef3f38b57c04479,developer_demo,2026-11-04T10:46:06.707332+00:00,234,unassisted_check,A01,gradual,revised,ready,1,1,T01,True,0,,0,,True

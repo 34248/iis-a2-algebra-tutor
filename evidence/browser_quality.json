@@ -1,6 +1,6 @@
 {
   "run_kind": "developer_check",
-  "checked_at_utc": "2026-11-03T11:24:05.648Z",
+  "checked_at_utc": "2026-11-04T10:46:07.623Z",
   "participant_study": false,
   "passed": true,
   "fault_injection": "Trace path is an existing file, preventing local directory writes.",

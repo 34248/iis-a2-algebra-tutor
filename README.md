@@ -1,41 +1,40 @@
-# Controlled algebra tutoring
+# Controlled algebra practice
 
-README prose word count: 778. Code and setup commands excluded.
+README prose word count: 723. Code and setup commands excluded.
 
-An IIS A2 prototype comparing attempt-first gradual help with an immediate worked solution. Both modes use identical checked content. Python 3.12 or later, standard library only.
+An IIS A2 learning workspace for the A1 question about attempt-first gradual help versus an immediate worked solution. Both modes reveal identical authored steps. Python 3.12 or later; the app uses the standard library only.
 
-## Run and inspect
+## Run
 ```text
-python app.py --port 8764
+python app.py --port 8764 --open
 ```
-Open http://127.0.0.1:8764 . The server stays bound to this computer. Stop with Ctrl+C. On Windows, run.cmd uses the prepared local Python 3.12 runtime if available, otherwise Python on PATH. Use a Python 3.12 or later interpreter.
+On this Windows computer, run.cmd selects the prepared Python runtime and opens the browser. Otherwise supply Python 3.12 or later. If the requested port is occupied the app selects a free local port; follow the printed URL. Stop the server with Ctrl+C. It binds only to 127.0.0.1 and needs no API key.
 
-Choose A01, revised gradual mode. Start, enter an attempt and request one hint. Compare immediate mode. Enter `2x + = 11` in revised mode, correct it and restart. Try T01 without help, then export the current session. The labelled baseline intentionally demonstrates missing-input guessing; use revised mode for ordinary inspection.
+## Use the workspace
+Choose an item and help format, then start. Record an explanation or check a complete equation. A recorded nonempty attempt unlocks the first requested hint in gradual mode. The equation checker releases no worked step. Immediate mode shows all the same steps together. Enter a final answer; successful completion offers the paired new question without hints. You may retry that question. Download the session CSV before starting again.
 
-## Status and technology
-Implemented: HTML interface and separate client.js browser controller, Python HTTP controller, input validation, independent session state, attempt gate, identical step content, rational numeric checks, local traces and CSV export. Simulated: tutor response synthesis in model.py. Planned: live-model integration if justified, participant comparison, prior-knowledge assessment, random assignment, conceptual scoring and retention measurement. There are two checked practice items and two unaided items; this is not a general equation solver.
+Nine practice items and nine paired new items cover whole numbers, negative values, fractions, brackets and variables on both sides. Demo controls are folded away: inspect incomplete input, the intentionally defective baseline or an unavailable response there. Equation feedback can be disabled in both conditions, including through the backend; the trace records this setting. The interface does not automatically assign conditions or lock a research task sequence.
 
-The A2 version imports the algebra path from the A1-aligned Lab4. Unrelated teaching-corpus, recorded-vision and scheduling exercises stay in the original lab. See docs/PROVENANCE.md and docs/DEVELOPMENT.md for the source snapshot, changes and checks.
+## Implemented and simulated work
+Implemented: browser workspace, session controller, exact numeric checks, symbolic linear-equation equivalence checks, startup verification of authored answers and substitution checks, completion feedback, paired-item handoff and CSV export. algebra.py reduces a restricted expression grammar to linear forms using Fraction. Submitted expressions are not executed. An equivalent line is not evidence that the learner understands its justification.
 
-## Data
-Session state and free-text attempts are held in memory. telemetry.py saves event metadata under data/; attempts and session access tokens are not written into the trace. CSV export contains only the selected session. Invalid unassisted input uses unassisted_invalid and an empty correctness field, rather than False. Correctness applies to valid numeric submissions. Terminal diagnostics omit free-text content. data/ is excluded from Git. Delete that local directory when its inspection traces are no longer needed. A restart resets practice state and makes old sessions unavailable to the UI; existing JSONL files remain on disk. File-write failure does not block practice. The export response and interface explain when the server copy could not be saved, while still offering the in-memory CSV download.
+Simulated: the language-model response boundary in model.py returns prefixes of checked content. No live language model is connected. The controller validates status and steps and displays its own acknowledgement. The equation checker is real rule-based computation, separate from that simulated component. Participant recruitment, prior-knowledge testing, assigned conditions, controlled post-testing and conceptual scoring remain planned. See docs/RESEARCH_PROTOCOL.md for what would be needed to test A1's research question.
 
-evidence/developer-demo*.csv are assistant-run demonstrations, labelled developer_demo. They are neither participant observations nor learning-effect results. No participant study has been conducted.
+## Records
+telemetry.py persists event metadata under data/ and exports the active session. Free-text working and session access tokens are excluded. A trace ID identifies a session, not a participant. Restarting the server removes in-memory practice state; saved files remain until deleted. data/ is excluded from Git and the review ZIP. A server-file failure is disclosed while an in-memory CSV remains downloadable.
 
-## Checks
+Invalid unaided input has its own event and blank correctness. Valid numeric submissions can be correct or incorrect. Equation equivalence, valid-answer counts and the feedback setting are additional fields. See docs/TRACE_FORMAT.md. Default terminal diagnostics omit free text. Files labelled developer_demo or developer_check were produced by assistant-run software checks, not research participants.
+
+## Development and checks
+The project adapts the algebra path of the earlier assisted Lab4, baseline commit 65fd133. Source fingerprints and exclusions are in docs/PROVENANCE.md. The original lab remains separate. docs/DEVELOPMENT.md records trace export, response-contract fixes, pending-request controls and the later learning-workspace development.
+
+The current release passes 40 code tests and 32 browser checks. Checks cover all authored items, equation syntax and equivalence, identical help text, wrong/invalid answers, response failure, overlapping requests, exports, mobile/dark layout, completion and the comparison setting. These establish software behaviour, not a learning improvement.
+
 ```text
 python -m unittest discover -v
 ```
-The checked A2 version has 27 passing code tests and 22 browser checks (16 interactions, two state regressions and four quality checks). Evidence records, screenshots and demonstration exports are in evidence/. The pre-fix evidence file explicitly records the two expected failures on v1; browser_regressions.json records their passing results on v2. Details of the controls and feedback fixes are in docs/DEVELOPMENT.md. Test sessions use isolated temporary trace directories. The browser automation checks real local HTTP requests and actual downloads. The nine additional code checks cover the response contract, exact numeric forms, invalid-input classification, logging and overlapping requests. Browser quality checks include a real trace-write failure; browser-quality-trace.csv is labelled developer_check. No performance or learning benefit is inferred from passing tests.
 
-## AI assistance and authorship
-OpenAI Codex prepared the earlier Lab4 code and this A2 extension, wrote and ran checks, captured evidence and helped draft the report. The humanizer skill was used for prose review without changing the technical claims. Examples of corrections include the runtime import order, restart/input timing and keeping free-text attempts out of persisted traces. The student needs to inspect the system and take responsibility for the submitted choices. No unaided authorship or participant activity is claimed. Local commits describe assisted development.
-
-## Report and version
-The report, architecture and interaction figures are in docs/. Local review release: a2-review-v3. The submitted commit and public repository URL must be recorded when published. GitHub is connected; repository creation and publication are pending. No working public URL is claimed. Additional local packaging and a Chinese reading guide accompany the report.
-
-## Reproducing browser inspection
-The optional scripts tools/browser_checks.cjs, tools/browser_regressions.cjs and tools/browser_quality.cjs use Node.js and Playwright, independently of the standard-library app. Install Playwright and its Chromium browser in a separate tooling environment, then run the script from this directory. Set PYTHON_EXECUTABLE to a Python 3.12 interpreter. BROWSER_EXECUTABLE may select an existing Chromium-family browser. Inspection creates fresh labelled demonstration evidence and uses a temporary trace directory. It does not recruit participants.
+Optional browser tooling uses Node.js and Playwright separately from the app. Set PYTHON_EXECUTABLE and, if using an existing Chromium-family browser, BROWSER_EXECUTABLE. Inspection uses temporary trace directories and writes labelled evidence.
 
 ```text
 npm install --no-save playwright
@@ -43,13 +42,14 @@ npx playwright install chromium
 node tools/browser_checks.cjs
 node tools/browser_regressions.cjs
 node tools/browser_quality.cjs
+node tools/browser_learning.cjs
 ```
 
-## Local review archive
-The accompanying ZIP contains this project, report copies, demonstration evidence and evidence/development.bundle. The bundle preserves the actual local Git history and is omitted from the repository itself. To restore that history from an extracted ZIP:
+## Assistance and review version
+OpenAI Codex adapted the earlier Lab4, implemented this extension, ran checks, captured evidence and helped draft the report and reading guides. The humanizer skill assisted prose review. Corrections include an answer leaking through format feedback, malformed input being scored as wrong, unconstrained response prose and inconsistent trace counts. The student still needs to inspect the choices and explain them. No unaided authorship or participant activity is claimed.
+
+Local review release: a2-review-v4. GitHub is connected; repository creation, publication and actual public links are pending. No Canvas submission has been made. docs/ contains report copies, editable figures, development records and Chinese reading companions. The review ZIP also includes evidence/development.bundle to restore the actual local history; the bundle itself is omitted from Git. Saved research papers are outside the public project package.
 
 ```text
 git clone evidence/development.bundle iis-a2
 ```
-
-The Chinese guides (including the full paragraph comparison and citation-use explanation) and docs/A2_REQUIREMENTS_CHECK.md explain review steps and the outstanding public links. The report is a review draft until those links and its submitted version are filled in. No Canvas upload has been made.

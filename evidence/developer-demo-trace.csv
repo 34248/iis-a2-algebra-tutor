@@ -1,4 +1,4 @@
-﻿trace_id,run_kind,timestamp_utc,elapsed_ms,event,practice_problem,condition,version,status,shown_steps,attempt_count,transfer_problem,correct
-709cefc62aa713cf,developer_demo,2026-11-03T11:24:03.909364+00:00,0,start,A01,gradual,revised,ready,0,0,,
-709cefc62aa713cf,developer_demo,2026-11-03T11:24:04.193436+00:00,282,attempt,A01,gradual,revised,ready,0,1,,
-709cefc62aa713cf,developer_demo,2026-11-03T11:24:04.421502+00:00,516,hint,A01,gradual,revised,ready,1,1,,
+﻿trace_id,run_kind,timestamp_utc,elapsed_ms,event,practice_problem,condition,version,status,shown_steps,attempt_count,transfer_problem,correct,step_checks,step_equivalent,answer_checks,final_correct,equation_feedback
+1d4337cf1db1bf9e,developer_demo,2026-11-04T10:46:05.025809+00:00,0,start,A01,gradual,revised,ready,0,0,,,0,,0,,True
+1d4337cf1db1bf9e,developer_demo,2026-11-04T10:46:05.127109+00:00,94,attempt,A01,gradual,revised,ready,0,1,,,0,,0,,True
+1d4337cf1db1bf9e,developer_demo,2026-11-04T10:46:05.360252+00:00,329,hint,A01,gradual,revised,ready,1,1,,,0,,0,,True

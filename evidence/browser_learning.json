@@ -1,0 +1,19 @@
+{
+  "run_kind": "developer_demo",
+  "checked_at_utc": "2026-11-04T10:46:07.443Z",
+  "passed": true,
+  "participant_study": false,
+  "checks": [
+    "Equivalent equation checked without releasing hints",
+    "Wrong equation feedback preserves released content",
+    "Fraction answer completes and selects paired item",
+    "Paired fraction answer checked without worked steps",
+    "Step-result trace exports without raw working",
+    "Negative coefficient exercise is checked correctly",
+    "Enter key submits independent answer",
+    "390px dark layout and collapsed demo controls",
+    "Multi-step fractional equation and six-step help",
+    "Optional equation feedback disabled across both comparison conditions"
+  ],
+  "screenshots": 4
+}
