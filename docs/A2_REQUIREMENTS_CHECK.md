@@ -1,5 +1,14 @@
-# Requirements status
+# A2 requirements check
 
-Checked against [Canvas A2](https://canvas.bham.ac.uk/courses/90253/assignments/633325) on 4 November 2026. Local release a2-review-v4; no submission made.
+Read the full [Canvas assignment and rubric](https://canvas.bham.ac.uk/courses/90253/assignments/633325) on 12 November 2026. Due 20 November 2026 at 21:00 UK time. One report must link the public repository and README and identify the submitted commit or release. An accompanying ZIP is only for material unsuitable for the repository. A2 requires no video. The current upload settings do not list extension restrictions.
 
-Abstract 134 words; main 1006; combined 1140. The report includes A1-linked design rationale, relevant module concepts, an architecture with implementation status, three illustrated interactions, sources and AI assistance. The README includes its count, setup, provenance, limitations, checks and development record. The prototype contains real rule-based equation checks; the language-model boundary is simulated. Participant research is planned. Public repository/README links and student hands-on review remain outstanding. The current page's 1400-word total and 1300-word reading-cutoff discrepancy does not affect this shorter report.
+Abstract 134 words; main 1070; combined 1204, conservatively including headings, AI acknowledgement and repository status. The abstract is within 300, the main within 1100 and the total below both the stated 1400 maximum and 1300 reading cutoff. Five pages is a layout choice, not a requirement.
+
+| Rubric | Weight | Evidence |
+| --- | --- | --- |
+| Design reasoning and scope | 30% | Report pages 1–2 and 4; A1 literature, module concepts, choices and limitations |
+| Developed interaction | 30% | Report page 3; [inspection route](INSPECTION.md) and current screenshots |
+| Architecture and technical reasoning | 20% | Report page 2; implemented checker, simulated response and planned study |
+| Development evidence and authorship | 20% | [README](../README.md), [development record](DEVELOPMENT.md), [decisions and attribution](DECISIONS.md), evidence and actual local Git history |
+
+Outstanding: public repository and README links, publication of the identified version, and the student's hands-on review. A local release identifier alone does not satisfy the public-link requirement. No submission or participant study has been completed. The report must not be described as submission-ready until these gaps are resolved.

@@ -1,40 +1,55 @@
 # Controlled algebra practice
 
-README prose word count: 723. Code and setup commands excluded.
+README prose word count: 667. Code and setup commands excluded.
 
-An IIS A2 learning workspace for the A1 question about attempt-first gradual help versus an immediate worked solution. Both modes reveal identical authored steps. Python 3.12 or later; the app uses the standard library only.
+An IIS A2 prototype for the A1 question about attempt-first gradual help versus immediate worked solutions. Nine authored practice items and nine paired new items cover signs, fractions, brackets and multi-step equations. Both help formats use identical checked steps.
 
-## Run
+## Status and review version
+
+Local review release: a2-review-v5. The application behaviour is unchanged from a2-review-v4; this revision strengthens the report, inspection instructions and evidence mapping. Public repository and README links are still outstanding. No Canvas submission has been made.
+
+Implemented: browser interaction, exact linear-equation checks, gradual/immediate help, answer checking, paired unaided practice and local trace export. Simulated: model.py returns checked steps through an offline response interface; no live language model is connected. Planned: recruitment, prior-knowledge measurement, condition assignment, controlled post-testing and conceptual scoring. [Research boundaries](docs/RESEARCH_PROTOCOL.md) explain these gaps.
+
+## Run or inspect
+
 ```text
 python app.py --port 8764 --open
 ```
-On this Windows computer, run.cmd selects the prepared Python runtime and opens the browser. Otherwise supply Python 3.12 or later. If the requested port is occupied the app selects a free local port; follow the printed URL. Stop the server with Ctrl+C. It binds only to 127.0.0.1 and needs no API key.
 
-## Use the workspace
-Choose an item and help format, then start. Record an explanation or check a complete equation. A recorded nonempty attempt unlocks the first requested hint in gradual mode. The equation checker releases no worked step. Immediate mode shows all the same steps together. Enter a final answer; successful completion offers the paired new question without hints. You may retry that question. Download the session CSV before starting again.
+Use Python 3.12 or later. The application has no third-party dependencies or API keys. run.cmd uses the prepared Windows runtime where available, otherwise Python on PATH. Follow the printed URL if the requested port is occupied. The server binds to 127.0.0.1; stop it with Ctrl+C.
 
-Nine practice items and nine paired new items cover whole numbers, negative values, fractions, brackets and variables on both sides. Demo controls are folded away: inspect incomplete input, the intentionally defective baseline or an unavailable response there. Equation feedback can be disabled in both conditions, including through the backend; the trace records this setting. The interface does not automatically assign conditions or lock a research task sequence.
+Start with the [inspection walkthrough](docs/INSPECTION.md). It gives inputs, expected responses, current screenshots and the source files responsible. The [report](docs/IIS_A2_Project_Report.pdf) contains the rationale, architecture and three illustrated interactions. Editable figures are in [docs/figures](docs/figures).
 
-## Implemented and simulated work
-Implemented: browser workspace, session controller, exact numeric checks, symbolic linear-equation equivalence checks, startup verification of authored answers and substitution checks, completion feedback, paired-item handoff and CSV export. algebra.py reduces a restricted expression grammar to linear forms using Fraction. Submitted expressions are not executed. An equivalent line is not evidence that the learner understands its justification.
+Record an explanation or check an equation before requesting gradual help. Immediate mode shows all the same steps together. A correct final answer offers the paired new question. New questions allow retries and immediate feedback, so they are practice rather than a controlled post-test. Export CSV before restarting. Demo controls contain the intentionally defective baseline, unavailable-response simulation and the option to disable equation feedback in either condition.
 
-Simulated: the language-model response boundary in model.py returns prefixes of checked content. No live language model is connected. The controller validates status and steps and displays its own acknowledgement. The equation checker is real rule-based computation, separate from that simulated component. Participant recruitment, prior-knowledge testing, assigned conditions, controlled post-testing and conceptual scoring remain planned. See docs/RESEARCH_PROTOCOL.md for what would be needed to test A1's research question.
+## Technology and boundaries
 
-## Records
-telemetry.py persists event metadata under data/ and exports the active session. Free-text working and session access tokens are excluded. A trace ID identifies a session, not a participant. Restarting the server removes in-memory practice state; saved files remain until deleted. data/ is excluded from Git and the review ZIP. A server-file failure is disclosed while an in-memory CSV remains downloadable.
+| Component | Role |
+| --- | --- |
+| HTML, CSS and client.js | Browser controls, persistent steps and feedback |
+| Python standard library and app.py | Local HTTP service and session controller |
+| algebra.py and Fraction | Restricted linear expressions and exact solution equivalence |
+| problems.json and transfer.json | Checked, authored tasks and solutions |
+| model.py | Simulated response boundary with validated step prefixes |
+| telemetry.py | Metadata-only JSONL and active-session CSV |
 
-Invalid unaided input has its own event and blank correctness. Valid numeric submissions can be correct or incorrect. Equation equivalence, valid-answer counts and the feedback setting are additional fields. See docs/TRACE_FORMAT.md. Default terminal diagnostics omit free text. Files labelled developer_demo or developer_check were produced by assistant-run software checks, not research participants.
+The checker does not execute submitted expressions or grade explanations. Fixed content keeps the help comparison inspectable; it cannot offer open-ended dialogue. Optional equation feedback is enforced by the server and recorded in the trace.
 
-## Development and checks
-The project adapts the algebra path of the earlier assisted Lab4, baseline commit 65fd133. Source fingerprints and exclusions are in docs/PROVENANCE.md. The original lab remains separate. docs/DEVELOPMENT.md records trace export, response-contract fixes, pending-request controls and the later learning-workspace development.
+## Development and assistance
 
-The current release passes 40 code tests and 32 browser checks. Checks cover all authored items, equation syntax and equivalence, identical help text, wrong/invalid answers, response failure, overlapping requests, exports, mobile/dark layout, completion and the comparison setting. These establish software behaviour, not a learning improvement.
+The [development record](docs/DEVELOPMENT.md) explains changes, their reasons and checks. [Provenance](docs/PROVENANCE.md) identifies the reused Lab4 baseline and source fingerprints. The original lab remains separate. The [decision record](docs/DECISIONS.md) distinguishes the student's stated requests from assistant implementation and review still to be done.
+
+OpenAI Codex adapted the lab, implemented features, ran checks, captured evidence and assisted drafting. Earlier prose review used the humanizer skill. Corrections included an answer leaking through placeholder feedback, invalid input being scored as wrong, declined responses releasing steps and stale results after input changes. These assistant-run checks do not establish the student's independent authorship or participant learning. The student must inspect the result and be able to explain the choices.
+
+## Checks and records
+
+The unchanged application has evidence for 40 code tests and 32 browser checks. [The evidence index](docs/INSPECTION.md#verification-evidence) links their results and distinguishes historical failures. These are software checks, not learning outcomes.
 
 ```text
 python -m unittest discover -v
 ```
 
-Optional browser tooling uses Node.js and Playwright separately from the app. Set PYTHON_EXECUTABLE and, if using an existing Chromium-family browser, BROWSER_EXECUTABLE. Inspection uses temporary trace directories and writes labelled evidence.
+Browser checks additionally require Node.js and Playwright. Set PYTHON_EXECUTABLE and optionally BROWSER_EXECUTABLE for an installed Chromium-family browser.
 
 ```text
 npm install --no-save playwright
@@ -45,10 +60,11 @@ node tools/browser_quality.cjs
 node tools/browser_learning.cjs
 ```
 
-## Assistance and review version
-OpenAI Codex adapted the earlier Lab4, implemented this extension, ran checks, captured evidence and helped draft the report and reading guides. The humanizer skill assisted prose review. Corrections include an answer leaking through format feedback, malformed input being scored as wrong, unconstrained response prose and inconsistent trace counts. The student still needs to inspect the choices and explain them. No unaided authorship or participant activity is claimed.
+Saved traces under data/ are excluded from Git and the review ZIP. They contain event metadata, not names, free-text working or access tokens. A trace identifier denotes a session, not a participant. Restart resets in-memory practice state; saved files remain until deleted. A file-write failure is disclosed while in-memory CSV remains downloadable. [Trace fields](docs/TRACE_FORMAT.md) explain invalid inputs and timing limits. developer_demo and developer_check records are automated examples.
 
-Local review release: a2-review-v4. GitHub is connected; repository creation, publication and actual public links are pending. No Canvas submission has been made. docs/ contains report copies, editable figures, development records and Chinese reading companions. The review ZIP also includes evidence/development.bundle to restore the actual local history; the bundle itself is omitted from Git. Saved research papers are outside the public project package.
+## Additional material
+
+The local review ZIP is a convenience copy, not an extra Canvas requirement. It includes evidence/development.bundle to restore the actual local Git history; the ignored bundle is not published in Git. Research-paper reading copies remain outside the repository and ZIP. The intended Canvas deliverable is one report linking the public repository, README and submitted commit or release. No video is required for A2.
 
 ```text
 git clone evidence/development.bundle iis-a2

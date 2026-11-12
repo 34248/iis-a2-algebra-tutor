@@ -1,6 +1,6 @@
 # Controlled Help in an Algebra Tutoring Prototype
 
-Formatted Word/PDF count: 1140 total; abstract 134; main 1006 including headings, AI acknowledgement and repository status. Short figure labels/captions and references excluded.
+Word count: 1204 total; abstract 134; main 1070. The formatted report count conservatively includes headings, AI acknowledgement and repository status.
 
 ## Abstract
 
@@ -10,13 +10,13 @@ This project explores how an introductory algebra tutor can offer help while lea
 
 Completing an equation with assistance does not establish independent problem solving. A1 proposed comparing help presentation while holding solution content fixed. Koedinger and Aleven’s (2007) assistance dilemma motivates preserving thinking opportunities alongside guidance. Intended users are university students revising introductory algebra. The authored set now has nine practice equations and nine paired unaided items, including brackets, fractions and variables on both sides. This extends an overly small two-item demonstration. Learners already proficient in these skills may score near the ceiling; a future study must assess prior knowledge rather than assume these tasks are challenging.
 
-The starting point was the A1-aligned Lab4 tutor. A2 retains that path and excludes unrelated retrieval, scheduling and recorded-image exercises. Development added trace export, response validation, equation checks and a clearer practice-to-unaided flow. Original source fingerprints and the Lab4 commit are in docs/PROVENANCE.md; the original lab remains separate.
+The starting point was the A1-aligned Lab4 tutor. A2 retains its algebra workflow to keep the prototype focused on the submitted research question. Unrelated retrieval, scheduling and image exercises are excluded. Development added trace export, response validation, equation checks and a clearer practice-to-unaided flow. Original source fingerprints and the Lab4 commit are in docs/PROVENANCE.md; the original lab remains separate.
 
 ## Design choices and supporting evidence
 
-Gradual mode requires a nonempty attempt before the first requested hint. Each subsequent request reveals one more checked step; immediate mode displays the same steps together. This preserves the combined comparison proposed in A1. Atkinson, Renkl and Merrill (2003) found transfer benefits from fading worked steps combined with self-explanation prompts, but their intervention does not establish the effect of this interface. Sale and Muldner (2019) found no significant overall learning difference between their hint conditions. These results support testing the choice without assuming that less assistance must improve learning.
+Gradual mode requires a nonempty attempt before the first requested hint. Each subsequent request reveals one more checked step; immediate mode displays the same steps together. This preserves the combined comparison proposed in A1. Atkinson, Renkl and Merrill (2003) found transfer benefits from fading worked steps combined with self-explanation prompts, but their intervention does not establish the effect of this interface. Sale and Muldner (2019) found no significant overall learning difference between their hint conditions. These results support testing the choice without assuming that less assistance must improve learning. A live generator could vary wording and introduce incorrect steps. Fixed content makes the presentation comparison inspectable, at the cost of open-ended conversation and personalised explanations.
 
-Released steps remain visible, with progress and attempt feedback. Week 2’s working-memory and external-state concepts informed this choice: users should not need to remember previously released help (University of Birmingham, 2026). That possible benefit has not been measured. Written explanations remain ungraded. Optional equation checks test algebraic equivalence using exact arithmetic; they cannot assess why a learner chose an operation. Checking a line releases no worked step.
+Released steps remain visible, with progress and attempt feedback. Week 2’s working-memory and external-state concepts informed this choice: users should not need to remember previously released help (University of Birmingham, 2026). That possible benefit has not been measured. Written explanations remain ungraded. Optional equation checks test algebraic equivalence using exact arithmetic; they cannot assess why a learner chose an operation. Checking a line releases no worked step. Learners request each hint themselves; this preserves control but may add effort or delay.
 
 Scope disclosure and recovery follow Amershi et al.’s (2019) guidelines on capability clarity, correction and limiting services when uncertain. The header identifies fixed content and simulated responses. The revised backend checks the complete equation against the selected item before releasing any step. An incomplete equation produces an editable correction request. The retained baseline deliberately skips that check to demonstrate the defect; it is an inspection option, not evidence of an observed commercial-model failure. A restart establishes a new session so conditions and progress cannot silently mix.
 
@@ -50,9 +50,9 @@ Bastani et al. (2025) motivate separating assisted from later unaided performanc
 
 OpenAI Codex assisted with implementation, tests, evidence capture, literature checks, drafting and language revision. Automated demonstrations are labelled separately from participant data. The README records the checks and changes.
 
-## Repository and version
+## Repository and submitted version
 
-Local review release: a2-review-v4. GitHub account connected; repository creation and public repository/README links pending.
+Local review release: a2-review-v5. Public repository and README links remain outstanding. The README links the development record and inspection walkthrough; this is not yet a submission-ready release.
 
 ## References
 

@@ -9,10 +9,10 @@ Added telemetry.py and an export endpoint. Traces store counts, timestamps, pres
 ## Corrections found during verification
 The independent Python runtime did not discover telemetry.py when it was imported before the app's explicit module-directory insertion. Moving the import below that insertion made direct startup work. Browser inspection also exposed input clearing after an asynchronous start request; clearing before the request preserves work typed while it is pending. Screenshot review also exposed inherited placeholders that supplied the first algebra step and numeric answer. They now ask for an original attempt and a number or fraction. Restart or setup changes clear old export messages, progress and unaided answers so the next session is not shown with stale state. Browser tests explicitly wait for completed responses before inspecting the UI.
 
-## Verification
+## Initial verification before later revisions
 18 automated code tests and 16 browser checks pass. Six screenshots and two downloadable CSV examples were produced by Codex. Mobile layout was checked at 390 pixels. Unknown export and cross-origin requests are refused. Browser checks preserve mode-content equality, correction/restart and unavailable-response behaviour. These are software checks, not participant research.
 
-## Limits and next work
+## Initial limits before the equation checker was added
 Attempts are checked for nonempty text, not mathematical reasoning. The baseline deliberately reveals a selected solution when input is mismatched and is clearly labelled as a defect demonstration. Unaided practice allows retries and is not a secure post-test. A future participant study requires suitable review and its own recruitment, assignment and analysis plan. No study outcome is fabricated.
 
 ## Review update on 3 November 2026
@@ -41,3 +41,10 @@ Expanded to nine practice/new-item pairs, including variables on both sides, bra
 Research review also identified that extra equation feedback could change the A1 comparison. Added a server-enforced session setting that disables it in either mode and records that choice. This supports controlling feedback; it does not implement assignment or a locked research sequence. RESEARCH_PROTOCOL.md distinguishes the implemented mechanism from the pre-test, controlled post-test, conceptual scoring and participant study still needed.
 
 40 code tests and 32 browser checks pass. The new tests verify all eighteen authored questions, exact equation forms, wrong steps, rejected syntax, catalog corruption, completion, fractional/multi-step items, privacy of exported working and comparison controls. Four current workspace screenshots and a labelled learning-demo export accompany the prior evidence. These remain software checks without participant learning outcomes.
+
+
+## Requirements review on 12 November 2026
+
+Rechecked the full Canvas A2 page and rubric. The report now explains the fixed-content trade-off, the cost of learner-controlled hints and the student's documented requests that shaped scope. The README links a three-interaction walkthrough, current evidence, provenance and a separate attribution record. Earlier verification and limits sections above are labelled as historical stages to avoid mistaking the initial nonempty-attempt check for the later equation checker.
+
+The application code and original software evidence are unchanged. This revision checks documentation links, report length and rendered pages, and packages the current source. No new participant data, live model, public upload or Canvas submission is claimed. Local release: a2-review-v5.
