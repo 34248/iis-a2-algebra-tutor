@@ -10,19 +10,19 @@
 <body>
 <main class="app">
   <header class="top">
-    <div class="brand"><span class="brand-mark" aria-hidden="true">x</span><span>Algebra practice<span class="brand-sub">IIS project · Learning workspace</span></span></div>
+    <div class="brand"><span class="brand-mark" aria-hidden="true">x</span><span>Algebra practice</span></div>
     <a class="offline" href="#about">Offline tutor <span aria-hidden="true">↗</span></a>
   </header>
-  <div class="intro"><div><p class="eyebrow">Linear equations · Four difficulty groups</p><h1>Work through the equation.</h1><p class="lead">Try your own line, check it, then choose whether to reveal a worked step.</p></div><p class="catalog-size">9 practice items<br><span>9 new questions without hints</span></p></div>
+  <div class="intro"><div><h1>Linear equations</h1><p class="lead">Choose a question and how much help you want.</p></div><p class="catalog-size">9 practice items<br><span>9 new questions without hints</span></p></div>
   <div class="workspace">
     <aside class="setup">
       <section class="card setup-card">
-        <p class="eyebrow">01 / Set up</p><h2>Your practice</h2>
+        <h2>Practice settings</h2>
         <label for="problem">Choose a problem</label><select id="problem" aria-describedby="problem-kind"></select>
         <p id="problem-kind" class="muted"></p>
         <label for="condition">How would you like help?</label>
         <select id="condition"><option value="gradual">Try first · step hints</option><option value="immediate">Full worked example</option></select>
-        <p id="mode-description" class="sub">Your attempt comes first. Reveal one step at a time.</p>
+        <p id="mode-description" class="sub">Write your first attempt to unlock a hint.</p>
         <button id="start" class="primary full">Start practice</button>
         <p class="setup-note">Starting again creates a fresh session. Download your record first if you want to keep it.</p>
       </section>
@@ -37,18 +37,18 @@
     </aside>
     <div class="learning">
       <section class="card practice-card" id="practice">
-        <div class="card-top"><span class="eyebrow">02 / Your working</span><span id="practice-state" class="pill">Ready to start</span></div>
+        <div class="card-top"><span class="eyebrow">Your working</span><span id="practice-state" class="pill">Ready to start</span></div>
         <p class="question-label">Solve for x</p><h2 id="current-equation" class="equation">2x + 3 = 11</h2>
         <p id="progress" class="muted">Choose how you want help, then start.</p>
         <p id="reply" class="feedback" role="status" aria-live="polite">Your working stays here while you practise.</p>
         <label for="attempt">Your next equation or explanation</label>
         <textarea id="attempt" rows="3" placeholder="Write a complete equation to check it, or describe your approach."></textarea>
         <div class="buttons working-buttons"><button id="check-step" disabled>Check this equation</button><button id="save-attempt" class="quiet" disabled>Record explanation</button></div>
-        <p class="sub">Equation checks compare solutions. Written explanations are recorded without a reasoning score.</p>
+        <p class="sub">Check whether your equation has the same solution. You can also save a written explanation without grading it.</p>
         <p id="step-feedback" class="feedback" role="status" aria-live="polite" hidden></p>
         <div class="help-area"><div class="help-top"><h3>Worked steps</h3><span id="hint-count" class="muted">0 of 3 shown</span></div>
           <progress id="hint-progress" max="3" value="0" aria-label="Worked steps visible"></progress>
-          <p id="steps-empty" class="empty">The steps you request will appear here and stay visible.</p>
+          <p id="steps-empty" class="empty">You can refer back to each step you open.</p>
           <ol id="steps" class="steps"></ol>
           <button id="hint" class="primary" disabled>Reveal next step <span aria-hidden="true">→</span></button>
         </div>
@@ -59,18 +59,18 @@
         <details class="events"><summary>View practice events</summary><ul id="events"></ul></details>
       </section>
       <section class="card independent-card" id="independent">
-        <p class="eyebrow">03 / On your own</p><h2>Try without hints.</h2><p class="lead-small">A different equation. Use what you have just practised.</p>
+        <h2>Try one on your own</h2>
         <label for="transfer">Choose a new question</label><select id="transfer"></select>
         <p id="transfer-equation" class="equation small-equation">4x + 1 = 13</p>
         <label for="transfer-answer">Your answer without help</label><input id="transfer-answer" placeholder="Enter a number or fraction" autocomplete="off">
-        <button id="transfer-check" class="full">Check independently</button>
+        <button id="transfer-check" class="full">Check answer</button>
         <p id="transfer-result" class="feedback" role="status" aria-live="polite">No hints or worked steps will be shown.</p>
         <p class="sub independent-note">You can retry. These practice answers are not a controlled learning assessment.</p>
       </section>
     </div>
   </div>
   <p id="error" class="error-banner" role="alert" hidden></p>
-  <footer><details id="about"><summary>About this prototype and your records</summary><p>Nine authored practice equations and nine paired questions cover warm-up, signed numbers, fractions and multi-step work. Equation equivalence is checked locally using exact arithmetic. Worked hints come from checked content; the language-model response boundary is simulated and no external AI is connected.</p><p>Operation counts and outcomes can be saved on this computer. Your free-text working and session access tokens are excluded from the saved trace. The software checks and sample CSV files are developer demonstrations. A participant study remains future work.</p></details></footer>
+  <footer><details id="about"><summary>About this prototype and your records</summary><p>Nine authored practice equations and nine paired questions cover warm-up, signed numbers, fractions and multi-step work. Equation equivalence is checked locally using exact arithmetic. Hints use worked solutions written for each question. The tutor runs offline without a live language model.</p><p>Operation counts and outcomes can be saved on this computer. Your free-text working and session access tokens are excluded from the saved trace. The software checks and sample CSV files are developer demonstrations. A participant study remains future work.</p></details></footer>
 </main>
 </body>
 </html>

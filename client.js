@@ -231,7 +231,7 @@ $('attempt').addEventListener('input', () => {
 });
 $('condition').addEventListener('change', () => {
   $('mode-description').textContent = $('condition').value === 'gradual'
-    ? 'Your attempt comes first. Reveal one step at a time.'
+    ? 'Write your first attempt to unlock a hint.'
     : 'The same checked steps appear together. You can still check your own working.';
 });
 $('try-independent').addEventListener('click', () => {

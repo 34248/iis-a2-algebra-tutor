@@ -5,3 +5,16 @@
 @media(max-width:700px){.app{padding:0 16px 24px}.top{min-height:76px;gap:10px}.brand{font-size:16px;gap:9px}.brand-sub{font-size:10px}.brand-mark{width:32px;height:36px}.offline{font-size:11px;padding:6px 9px}.intro{padding:26px 0 24px}.intro .eyebrow{font-size:10px}h1{font-size:29px}.lead{font-size:13px}.catalog-size{display:none}.workspace{grid-template-columns:1fr;gap:18px}.setup{display:grid;grid-template-columns:1fr}.setup-card{padding:20px}.setup-card h2{margin-bottom:14px}.setup-card .sub{min-height:0}.setup-note{font-size:11px}.fold{margin-top:10px}.card{padding:20px}.learning{gap:18px}.equation{font-size:32px}.card-top{margin-bottom:22px}.answer-row{flex-wrap:wrap}.answer-row input{flex:1;min-width:130px}.answer-row button{padding:11px 12px}.record-area{align-items:flex-start}.record-area button{font-size:12px;padding:9px}.completion button{width:100%}.independent-card .full{max-width:none}}
 @media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#141d18;--surface:#1c2820;--sunk:#253329;--ink:#e6ede5;--muted:#b1beb0;--line:#35473a;--accent:#a9d69a;--accent-soft:#2c412e;--good:#b6e1a6;--warn:#e6c67f;--warn-soft:#3b321c;--bad:#f1b1a5;--bad-soft:#402922}.brand-mark,button.primary{color:#172918}.completion{border-color:#476244}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}button{transition:none}}
+
+.practice-card { border-top: 3px solid var(--accent); }
+#current-equation {
+  background: var(--sunk);
+  padding: 14px 18px;
+  border-radius: 9px;
+  font-variant-numeric: lining-nums;
+}
+#step-feedback[data-status="warn"] { border-left-color: var(--warn); }
+@media (max-width: 700px) {
+  .intro { padding-block: 16px; }
+  .working-buttons button { min-height: 44px; }
+}
