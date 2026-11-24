@@ -292,7 +292,10 @@ for (const [field, button] of [['answer', 'check-answer'], ['transfer-answer', '
 }
 syncControls();
 function addOption(select, item, currentOnly = false) {
-  const option = node('option', currentOnly ? 'Generated' : select.id === 'problem' ? item.id : item.id + ' · ' + item.difficulty);
+  let label = item.id + ' · ' + item.difficulty;
+  if (currentOnly) label = 'Generated';
+  else if (select.id === 'problem') label = String(select.options.length + 1);
+  const option = node('option', label);
   option.value = item.id;
   option.hidden = currentOnly;
   if (currentOnly) select.querySelector('option[hidden]')?.remove();
