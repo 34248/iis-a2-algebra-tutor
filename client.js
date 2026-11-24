@@ -287,17 +287,18 @@ for (const [field, button] of [['answer', 'check-answer'], ['transfer-answer', '
   });
 }
 syncControls();
-function addOption(id, item) {
-  const generated = /^[GU]/.test(item.id);
-  const option = node('option', generated ? item.question : item.id + ' · ' + item.difficulty);
+function addOption(select, item, currentOnly = false) {
+  const option = node('option', currentOnly ? 'Current generated question' : item.id + ' · ' + item.difficulty);
   option.value = item.id;
-  $(id).append(option);
+  option.hidden = currentOnly;
+  if (currentOnly) select.querySelector('option[hidden]')?.remove();
+  select.append(option);
 }
 
-function updateCount() {
-  const size = document.querySelector('.catalog-size');
-  size.replaceChildren(node('span', config.problems.length + ' practice items'), document.createElement('br'),
-    node('span', config.transfer.length + ' new questions without hints'));
+function fillCatalogue(select, items) {
+  for (const item of items) {
+    if (!/^[GU]/.test(item.id)) addOption(select, item);
+  }
 }
 
 bind('generate', async () => {
@@ -305,11 +306,10 @@ bind('generate', async () => {
   const pair = await api('/api/generate', {difficulty: $('difficulty').value});
   config.problems.push(pair.practice);
   config.transfer.push(pair.partner);
-  addOption('problem', pair.practice);
-  addOption('transfer', pair.partner);
+  addOption($('problem'), pair.practice, true);
+  addOption($('transfer'), pair.partner, true);
   $('problem').value = pair.practice.id;
   $('problem').dispatchEvent(new Event('change'));
-  updateCount();
   $('generation-status').textContent = 'Saved on this computer. Select Start practice to begin.';
 });
 $('problem').addEventListener('change', () => { $('generation-status').textContent = ''; });
@@ -318,11 +318,13 @@ $('problem').addEventListener('change', () => { $('generation-status').textConte
     const response = await fetch('/api/config');
     if (!response.ok) throw Error('Could not load the checked practice items. Reload to retry.');
     const loaded = await response.json();
-    for (const item of loaded.problems) addOption('problem', item);
-    for (const item of loaded.transfer) addOption('transfer', item);
+    fillCatalogue($('problem'), loaded.problems);
+    fillCatalogue($('transfer'), loaded.transfer);
     config = loaded;
     $('generator').hidden = !loaded.local_generation;
-    updateCount();
+    document.querySelector('.catalog-size').replaceChildren(
+      node('span', $('problem').length + ' practice items'), document.createElement('br'),
+      node('span', $('transfer').length + ' new questions without hints'));
     $('problem-kind').textContent = topicNote(loaded.problems[0].difficulty);
     $('current-equation').textContent = loaded.problems[0].question;
     resetUnassisted();
@@ -342,6 +344,7 @@ function installBilingualView() {
     'Starting again creates a separate practice record.': '重新开始会单独记录一次练习。',
     'New question difficulty': '新题难度',
     'Basic': '基础', 'Multi-step': '多步', 'Challenge': '挑战',
+    'Current generated question': '当前生成题',
     'Generate a new question': '生成新题',
     'Saved on this computer. Select Start practice to begin.': '题目已保存在本机，点击「开始练习」即可作答。',
     'Algebra practice': '代数练习',
