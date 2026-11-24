@@ -76,6 +76,18 @@
         <label for="transfer-answer">Your answer without help</label><input id="transfer-answer" placeholder="Enter a number or fraction" autocomplete="off">
         <button id="transfer-check" class="full">Check answer</button>
         <p id="transfer-result" class="feedback" role="status" aria-live="polite">No hints or worked steps will be shown.</p>
+        <div id="help-review" hidden>
+          <label for="rating">How helpful were the worked steps during practice? (optional)</label>
+          <select id="rating">
+            <option value="">Choose a rating</option>
+            <option value="not_helpful">Not helpful</option>
+            <option value="somewhat">A little helpful</option>
+            <option value="very">Very helpful</option>
+            <option value="not_viewed">I did not view the steps</option>
+          </select>
+          <button id="save-rating" type="button" class="full">Save rating</button>
+          <p id="rating-status" class="sub" role="status"></p>
+        </div>
         <p class="sub independent-note">You can retry. These practice answers are not a controlled learning assessment.</p>
       </section>
     </div>

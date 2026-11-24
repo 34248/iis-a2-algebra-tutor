@@ -39,10 +39,12 @@ const assert = require('node:assert/strict');
     await a.fill('#answer','4');
     await a.click('#check-answer');
     await a.click('#try-independent');
+    assert(await a.locator('#help-review').isHidden());
     for (const [value, text] of [['1','Not correct'],['3','Correct.']]) {
       await a.fill('#transfer-answer',value);
       await a.click('#transfer-check');
       await a.locator('#transfer-result').filter({hasText:text}).waitFor();
+      assert(await a.locator('#help-review').isVisible());
     }
     await observer.selectOption('#tester-filter','P01');
     const row = observer.locator('#rows tr');
@@ -50,7 +52,14 @@ const assert = require('node:assert/strict');
     assert.equal(await row.count(),1);
     assert.match(await row.locator('td').nth(8).innerText(),/Incorrect/);
     assert.equal(await row.locator('td').nth(5).innerText(),'1');
+    for (const [value, text] of [['not_viewed','没看步骤'],['somewhat','有一点帮助']]) {
+      await a.selectOption('#rating',value);
+      await a.click('#save-rating');
+      await a.locator('#rating-status').filter({hasText:'评价已保存'}).waitFor();
+      await row.locator('td').last().filter({hasText:text}).waitFor();
+    }
     await observer.selectOption('#tester-filter','03');
+    assert.match(await row.locator('td').last().innerText(),/未评价/);
     assert.equal(await row.locator('td').nth(8).innerText(),'—');
     await observer.reload();
     await observer.waitForFunction(()=>document.querySelectorAll('#rows tr').length===2);

@@ -6,6 +6,10 @@ let lastUpdate;
 let failed = false;
 const label = (en, zh) => bilingual ? en + ' / ' + zh : en;
 const outcome = value => value == null ? '—' : value ? label('Correct','正确') : label('Incorrect','错误');
+const ratings = {
+  not_helpful:['Not helpful','没有帮助'], somewhat:['A little helpful','有一点帮助'],
+  very:['Very helpful','很有帮助'], not_viewed:['Did not view steps','没看步骤']
+};
 function render() {
   const filter = byId('tester-filter');
   const selected = filter.value;
@@ -20,7 +24,8 @@ function render() {
     const row = document.createElement('tr');
     const values = [s.tester,new Date(s.started).toLocaleString(),s.problem,
       s.mode === 'gradual' ? label('Step hints','逐步提示') : label('Full example','完整例题'),
-      s.attempts,s.shown,outcome(s.practice),s.partner,outcome(s.independent_first),outcome(s.independent_latest)];
+      s.attempts,s.shown,outcome(s.practice),s.partner,outcome(s.independent_first),outcome(s.independent_latest),
+      label(...(ratings[s.help_rating] || ['Not rated','未评价']))];
     for (const value of values) row.insertCell().textContent = value;
     return row;
   }));

@@ -5,6 +5,8 @@ let busy = false;
 let current = null;
 let checkedWorking = null;
 let checkedLocations = [];
+let pairedAnswerSubmitted = false;
+let savedRating = '';
 const topicNote = difficulty => ({'Warm-up': 'Two-step equations with whole numbers.', 'Signed numbers': 'Practise signs and negative values.', 'Fractions': 'Work with fractional values and coefficients.', 'Challenge': 'Practise clearing denominators, nested brackets and decimal coefficients.', 'Multi-step': 'Work with brackets, fractions and x on both sides.'})[difficulty];
 
 function node(tag, text) {
@@ -39,6 +41,8 @@ function syncControls() {
     busy || !current || current.status !== 'ready';
   $('hint').disabled = busy || !current || !current.next_hint_allowed;
   $('transfer-check').disabled = busy || !config;
+  $('rating').disabled = busy;
+  $('save-rating').disabled = busy || !pairedAnswerSubmitted || !$('rating').value || $('rating').value === savedRating;
   $('check-step').disabled = busy || !current || current.status !== 'ready' || !current.equation_feedback;
   $('try-independent').disabled = busy || !current || !current.solved;
 }
@@ -112,14 +116,20 @@ function bind(id, action) {
 }
 
 function resetUnassisted() {
+  $('help-review').hidden = !pairedAnswerSubmitted || $('transfer').value !== current?.transfer_id;
+  $('rating').value = savedRating;
+  $('rating-status').textContent = savedRating ? 'Rating saved.' : '';
   $('transfer-answer').value = '';
   $('transfer-result').textContent = 'No hints or worked steps will be shown.';
   $('transfer-result').dataset.status = '';
   const item = config && config.transfer.find(item => item.id === $('transfer').value);
   if (item) $('transfer-equation').textContent = item.question;
+  syncControls();
 }
 
 function resetPractice(message) {
+  pairedAnswerSubmitted = false;
+  savedRating = '';
   $('independent').hidden = true;
   session = null;
   current = null;
@@ -235,10 +245,24 @@ bind('transfer-check', async () => {
   const result = await api('/api/transfer', {
     session, problem_id: $('transfer').value, answer: submitted,
   });
+  if (result.valid && session && $('transfer').value === current?.transfer_id) {
+    pairedAnswerSubmitted = true;
+    $('help-review').hidden = false;
+  }
   $('transfer-result').dataset.status = $('transfer-answer').value === submitted ? (result.correct ? 'good' : 'warn') : '';
   $('transfer-result').textContent = $('transfer-answer').value === submitted
     ? result.reply
     : 'Your answer changed while checking. Check the current answer again.';
+});
+
+$('rating').addEventListener('change', () => {
+  $('rating-status').textContent = '';
+  syncControls();
+});
+bind('save-rating', async () => {
+  const result = await api('/api/rating', {session, rating: $('rating').value});
+  savedRating = result.rating;
+  $('rating-status').textContent = 'Rating saved.';
 });
 
 for (const id of ['condition', 'version', 'equation', 'equation-feedback', 'tester']) {
@@ -361,6 +385,11 @@ function installBilingualView() {
     'Use up to 6 letters or digits, e.g. 03. Reuse your code for repeat tests or leave it blank for private practice.': '编号可用 1 至 6 位英文字母或数字，例如 03。重复测试用同一编号，留空则只自己练习。',
     'Use up to 6 letters or digits, or leave the code blank.': '请填写最多 6 位英文字母或数字，也可留空。',
     'Live results': '实时结果',
+    'How helpful were the worked steps during practice? (optional)': '刚才练习时，给出的解题步骤对你有多大帮助？（选填）',
+    'Choose a rating': '选择评价', 'Not helpful': '没有帮助', 'A little helpful': '有一点帮助',
+    'Very helpful': '很有帮助', 'I did not view the steps': '没看步骤',
+    'Save rating': '保存评价', 'Rating saved.': '评价已保存。',
+    'Could not save the rating. Please try again.': '评价未能保存，请重试。',
     'Starting again creates a separate practice record.': '重新开始会单独记录一次练习。',
     'Basic': '基础', 'Multi-step': '多步', 'Challenge': '挑战',
     'Generated': '生成题', 'Question type': '题型', 'Signed numbers': '正负数',

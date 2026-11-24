@@ -13,6 +13,7 @@ The CSV is a technical trace. Each row is an operation in one practice session, 
 | step_checks, step_equivalent | Equation-check count; this check's equivalence result, blank if unavailable or unrelated |
 | answer_checks, final_correct | Valid practice-answer count and latest practice result; invalid input clears the latter |
 | transfer_problem, correct | Unaided item and numeric correctness; invalid input has blank correctness |
+| help_rating | Optional self-report after a valid answer to the assigned independent item. Each change adds a rate_help event. Live results shows the latest saved choice or Not rated. |
 
 step_equivalent compares unique solutions of supported linear equations. It does not grade an explanation or prove an appropriate sequence of learning. No raw working, explanation text, entered numeric answer or session access token is persisted in this schema. Conceptual scoring or participant linkage would need separately designed data handling.
 

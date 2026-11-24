@@ -275,10 +275,29 @@ def transfer(payload):
         state = session_for(payload) if payload.get('session') is not None else None
         data = _transfer(payload)
         if state is not None:
+            if data['valid'] and payload['problem_id'] == state['paired_problem']:
+                state['paired_answer_submitted'] = True
             telemetry.record(state, 'unassisted_check' if data['valid'] else
                              'unassisted_invalid', transfer_problem=payload['problem_id'],
                              correct=data['correct'])
         return data
+
+
+def rate_help(payload):
+    with LOCK:
+        state = session_for(payload)
+        if not state.get('paired_answer_submitted'):
+            raise UserError('Answer the paired question before rating the help.')
+        rating = payload.get('rating')
+        if rating not in ('not_helpful', 'somewhat', 'very', 'not_viewed'):
+            raise UserError('Choose a rating from the list.')
+        if state.get('help_rating') != rating:
+            try:
+                telemetry.record(state, 'rate_help', help_rating=rating)
+            except OSError:
+                raise UserError('Could not save the rating. Please try again.') from None
+            state['help_rating'] = rating
+        return {'rating': rating}
 
 
 def export_trace(payload):
@@ -380,7 +399,7 @@ class Handler(BaseHTTPRequestHandler):
                     self.headers.get_content_type() != 'application/json'):
                 return self.respond({'error': 'Use the local practice page.'}, 403)
             actions = {'/api/start': start, '/api/action': action, '/api/generate': generate_pair,
-                       '/api/transfer': transfer, '/api/export': export_trace}
+                       '/api/transfer': transfer, '/api/rating': rate_help, '/api/export': export_trace}
             handler = actions.get(urlsplit(self.path).path)
             if handler is None:
                 return self.respond({'error': 'Not found'}, 404)

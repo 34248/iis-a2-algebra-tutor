@@ -8,7 +8,7 @@ DATA_DIR=Path(os.environ.get('TUTOR_DATA_DIR',str(Path(__file__).parent/'data'))
 RUN_KIND=os.environ.get('TUTOR_RUN_KIND','local_inspection')
 FIELDS=['trace_id','run_kind','timestamp_utc','elapsed_ms','event','practice_problem','condition','version','status','shown_steps','attempt_count','transfer_problem','correct','step_checks','step_equivalent','answer_checks','final_correct','equation_feedback']
 LOCK=threading.RLock()
-FIELDS += ['tester','paired_problem']
+FIELDS += ['tester','paired_problem','help_rating']
 
 def record(session,event,**extra):
     with LOCK:
@@ -22,13 +22,17 @@ def record(session,event,**extra):
              'step_equivalent':extra.get('step_equivalent',''),'answer_checks':session.get('answer_checks',0),
              'final_correct':session.get('final_correct',''),'equation_feedback':session.get('equation_feedback',True)}
         row.update(tester=session.get('tester',''), paired_problem=session.get('paired_problem',''))
-        session.setdefault('_trace_rows',[]).append(row)
-        live_results.update(row)
+        if event == 'rate_help':
+            row['help_rating'] = extra['help_rating']
         try:
             DATA_DIR.mkdir(parents=True,exist_ok=True)
             with (DATA_DIR/(session['trace_id']+'.jsonl')).open('a',encoding='utf-8') as f:f.write(json.dumps(row)+'\n')
         except OSError:
             session['_trace_save_error']=True
+            if event == 'rate_help':
+                raise
+        session.setdefault('_trace_rows',[]).append(row)
+        live_results.update(row)
         return row
 
 def export(session):

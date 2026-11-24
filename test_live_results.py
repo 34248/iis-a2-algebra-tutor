@@ -22,12 +22,26 @@ class LiveResultTests(unittest.TestCase):
             app.start(dict(payload, tester='Team2'))
             app.start(dict(payload, tester='P01'))
             app.action({'session':session, 'action':'check', 'answer':'4'})
-            for problem, answer in [('T02','7'),('T01','hello'),('T01','1'),('T01','3')]:
+            for problem, answer in [('T02','7'),('T01','hello')]:
                 app.transfer({'session':session,'problem_id':problem,'answer':answer})
+                with self.assertRaises(app.UserError):
+                    app.rate_help({'session':session,'rating':'somewhat'})
+            for problem, answer in [('T01','1'),('T01','3')]:
+                app.transfer({'session':session,'problem_id':problem,'answer':answer})
+            with self.assertRaises(app.UserError):
+                app.rate_help({'session':session,'rating':'invalid'})
+            with patch.object(Path, 'open', side_effect=OSError), self.assertRaises(app.UserError):
+                app.rate_help({'session':session,'rating':'somewhat'})
+            self.assertTrue(all(r['help_rating'] is None for r in live_results.snapshot()))
+            for rating in ['very','not_helpful','not_viewed','somewhat','somewhat']:
+                app.rate_help({'session':session,'rating':rating})
+            self.assertEqual(sum(r['event'] == 'rate_help' for r in app.SESSIONS[session]['_trace_rows']),4)
             rows = live_results.snapshot()
             self.assertCountEqual([r['tester'] for r in rows], ['P01','P01','03','TEAM2'])
             row = next(r for r in rows if r['independent_checks'])
             self.assertEqual((row['practice'],row['independent_first'],row['independent_latest']), (True,False,True))
             self.assertEqual(row['independent_checks'], 2)
+            self.assertEqual(row['help_rating'],'somewhat')
+            self.assertTrue(all(r['help_rating'] is None for r in rows if r is not row))
             live_results.restore(Path(tmp))
             self.assertEqual(rows,live_results.snapshot())
