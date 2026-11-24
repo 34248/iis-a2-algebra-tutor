@@ -371,6 +371,69 @@ window.addEventListener('hashchange', selectLinkedChallenge);
 
 // Positive coefficients for x and opposite signs for y guarantee one intersection.
 let system;
+let shownSystemSteps = 0;
+let systemAttemptSubmitted = false;
+
+function systemSteps() {
+  const {a, b, c, d, x, y, firstTotal: r, secondTotal: s} = system;
+  const k = a*d + b*c;
+  const total = d*r + b*s;
+  const steps = $('system-method').value === 'elimination' ? [
+    ['Scale the first equation', `① × ${d}  ⇒  ${a*d}x + ${b*d}y = ${d*r}`],
+    ['Scale the second equation', `② × ${b}  ⇒  ${b*c}x − ${b*d}y = ${b*s}`],
+    ['Add the equations to cancel y', `(${a*d} + ${b*c})x = ${d*r} + (${b*s})  ⇒  ${k}x = ${total}`],
+  ] : [
+    ['Express y using the first equation', `y = (${r} − ${a}x) / ${b}`],
+    ['Replace y in the second equation', `${c}x − ${d} × ((${r} − ${a}x) / ${b}) = ${s}`],
+    ['Clear the denominator', `${b*c}x − ${d}(${r} − ${a}x) = ${b*s}`],
+    ['Expand and collect the x terms', `(${b*c} + ${d*a})x = ${b*s} + (${d*r})  ⇒  ${k}x = ${total}`],
+  ];
+  steps.push(
+    ['Solve for x', `x = ${total} / ${k} = ${x}`],
+    ['Put x back into the first equation', `${a} × (${x}) + ${b}y = ${r}  ⇒  ${b}y = ${r-a*x}`],
+    ['Solve for y', `y = ${r-a*x} / ${b} = ${y}`],
+    ['Check the pair in both equations', `①  ${a} × (${x}) + ${b} × (${y}) = ${r}     ②  ${c} × (${x}) − ${d} × (${y}) = ${s}`]
+  );
+  return steps;
+}
+
+function renderSystemSteps() {
+  const gradual = $('system-mode').value === 'gradual';
+  const steps = systemSteps();
+  const count = gradual ? shownSystemSteps : steps.length;
+  $('system-steps').replaceChildren(...steps.slice(0, count).map(([label, equation]) => {
+    const item = document.createElement('li');
+    item.append(node('span', label), node('div', equation));
+    return item;
+  }));
+  $('system-count').textContent = count + ' of ' + steps.length + ' shown';
+  $('system-working').hidden = !gradual;
+  $('system-instruction').textContent = systemAttemptSubmitted ? 'Select Reveal next step to continue.' : 'Write your first attempt to unlock a hint.';
+  $('system-instruction').hidden = count === steps.length;
+  $('system-submit').hidden = systemAttemptSubmitted;
+  $('system-submit').disabled = !$('system-attempt').value.trim();
+  $('system-next').hidden = !gradual;
+  $('system-next').disabled = !systemAttemptSubmitted || count >= steps.length;
+}
+
+$('system-attempt').addEventListener('input', () => {
+  $('system-submit').disabled = !$('system-attempt').value.trim();
+});
+$('system-submit').addEventListener('click', () => {
+  systemAttemptSubmitted = true;
+  renderSystemSteps();
+  $('system-next').focus();
+});
+$('system-next').addEventListener('click', () => {
+  shownSystemSteps++;
+  renderSystemSteps();
+});
+$('system-mode').addEventListener('change', renderSystemSteps);
+$('system-method').addEventListener('change', () => {
+  shownSystemSteps = 0;
+  renderSystemSteps();
+});
+
 function newSystem() {
   const integer = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
   const a = integer(2, 7), b = integer(2, 7), c = integer(2, 7), d = integer(2, 7);
@@ -379,15 +442,15 @@ function newSystem() {
   const y = integer(-8, 8);
   const firstTotal = a * x + b * y;
   const secondTotal = c * x - d * y;
-  system = {a, b, c, d, x, firstTotal, secondTotal};
+  system = {a, b, c, d, x, y, firstTotal, secondTotal};
   $('system-first').textContent = a + 'x + ' + b + 'y = ' + firstTotal;
   $('system-second').textContent = c + 'x − ' + d + 'y = ' + secondTotal;
-  $('elimination-formula').textContent = d + ' × ① + ' + b + ' × ②  ⇒  ' +
-    (d * a + b * c) + 'x = ' + (d * firstTotal + b * secondTotal);
-  $('substitution-formula').textContent = 'y = (' + firstTotal + ' − ' + a + 'x) / ' + b;
+  shownSystemSteps = 0;
+  systemAttemptSubmitted = false;
+  $('system-attempt').value = '';
+  renderSystemSteps();
   $('system-answer').reset();
   $('system-feedback').hidden = true;
-  for (const hint of $('system-hints').querySelectorAll('details')) hint.open = false;
 }
 newSystem();
 
@@ -448,12 +511,19 @@ function installBilingualView() {
     'Generate a new question': '生成新题',
     'Two-variable challenge': '二元方程组挑战',
     'Find the pair that satisfies both equations.': '求同时满足两个方程的 x 和 y。',
-    'Elimination hint': '消元法提示',
-    'Substitution hint': '代入法提示',
-    'Scale the two equations as shown, then add them to eliminate y.': '按下面的倍数分别乘第一式和第二式，相加消去 y。',
-    'Use the first equation to express y, then substitute into the second.': '用第一式表示 y，再代入第二式。',
+    'Solution method': '解法', 'Elimination': '消元法', 'Substitution': '代入法',
+    'Submit first attempt': '提交第一步', 'Select Reveal next step to continue.': '点击「查看下一步」继续。',
+    'Scale the first equation': '把第一式两边同乘一个数',
+    'Scale the second equation': '把第二式两边同乘一个数',
+    'Add the equations to cancel y': '两式相加，消去 y',
+    'Express y using the first equation': '从第一式解出 y 的表达式',
+    'Replace y in the second equation': '把 y 的表达式代入第二式',
+    'Clear the denominator': '两边同乘分母，去分母',
+    'Expand and collect the x terms': '展开括号并合并含 x 的项',
+    'Put x back into the first equation': '把 x 的值代回第一式',
+    'Solve for y': '求出 y', 'Check the pair in both equations': '把这组解代回两个方程检验',
     'Check both equations': '检验两个方程',
-    'Extra practice outside the two help modes. Answers stay on this page.': '这是两种提示模式之外的额外练习，答案只在本页核对。',
+    'Extra practice. Answers stay on this page.': '这是额外练习，答案只在本页核对。',
     'Enter a number or a fraction with a nonzero denominator for each variable.': '请为 x 和 y 各填一个数；若填分数，分母须非零。',
     'Correct. Your pair satisfies both equations.': '答对了，这组数同时满足两个方程。',
     'The first equation balances. Check the second.': '第一个方程成立，请检查第二个。',

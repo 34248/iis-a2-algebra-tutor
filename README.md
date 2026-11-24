@@ -1,6 +1,6 @@
 # Controlled help in algebra practice
 
-README prose word count: 547 (excluding headings and commands).
+README prose word count: 570 (excluding headings and commands).
 
 ## Run the tutor
 
@@ -14,7 +14,7 @@ Choose a question type, then select a problem and a help mode. A10 through A13 c
 
 Select a question type and click Generate a new question. For single-variable exercises, the tutor checks the steps and both answers, saves the pair under data/generated and lets you start practice in either help mode. The menus show the built-in items and the current generated question.
 
-For a system of equations, select Two variables and use the same button. Enter x and y in the workspace. The hints and answer check use both equations. This extra practice sits outside the recorded comparison.
+For a system of equations, select Two variables and use the same button. Enter x and y in the workspace. Submit a first line of working to unlock one step at a time, or choose Full example. Both elimination and substitution use the current equations. The final check tests both coordinates. This extra practice sits outside the recorded comparison.
 
 ## Try the comparison
 

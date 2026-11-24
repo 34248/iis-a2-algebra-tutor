@@ -55,6 +55,12 @@
         <h2 id="system-title">Two-variable challenge</h2>
         <p>Find the pair that satisfies both equations.</p>
         <div class="equation system-equations" aria-live="polite"><div id="system-first"></div><div id="system-second"></div></div>
+        <div id="system-working">
+          <label for="system-attempt">Your working or explanation</label>
+          <textarea id="system-attempt" rows="3" maxlength="2500" aria-describedby="system-instruction"></textarea>
+          <p class="sub" id="system-instruction">Write your first attempt to unlock a hint.</p>
+          <button type="button" id="system-submit" disabled>Submit first attempt</button>
+        </div>
         <form id="system-answer">
           <div class="system-coordinates">
             <label>x<input id="system-x" maxlength="50" autocomplete="off"></label>
@@ -63,12 +69,17 @@
           <button class="primary">Check both equations</button>
           <p class="feedback" id="system-feedback" role="status" hidden></p>
         </form>
-        <p class="sub">Extra practice outside the two help modes. Answers stay on this page.</p>
+        <p class="sub">Extra practice. Answers stay on this page.</p>
       </section>
       <aside class="card hint-card" id="system-hints" hidden>
-        <h2>Hints</h2>
-        <details><summary>Elimination hint</summary><p>Scale the two equations as shown, then add them to eliminate y.</p><p id="elimination-formula"></p></details>
-        <details><summary>Substitution hint</summary><p>Use the first equation to express y, then substitute into the second.</p><p id="substitution-formula"></p></details>
+        <h2>Worked steps</h2>
+        <label for="system-mode">How would you like help?</label>
+        <select id="system-mode"><option value="gradual">Step hints</option><option value="immediate">Full example</option></select>
+        <label for="system-method">Solution method</label>
+        <select id="system-method"><option value="elimination">Elimination</option><option value="substitution">Substitution</option></select>
+        <p class="sub" id="system-count" aria-live="polite"></p>
+        <ol id="system-steps" class="steps" aria-live="polite"></ol>
+        <button type="button" class="primary" id="system-next">Reveal next step</button>
       </aside>
       <section class="card practice-card single-only" id="practice">
         <div class="card-top"><span class="eyebrow">Your working</span><span id="practice-state" class="pill">Ready to start</span></div>

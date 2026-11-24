@@ -54,7 +54,6 @@ main > .language-switch { float: right; margin: 0 0 8px 10px; }
 #generation-status:empty { display:none; }
 .system-challenge form { max-width:520px; }
 .system-equations { margin:20px 0; padding:7px 16px; border-left:3px solid var(--accent); }
-#system-hints details { padding:10px 0; border-bottom:1px solid var(--line); }
-#system-hints summary { color:var(--accent); cursor:pointer; }
+#system-hints .steps li > div { margin-top:4px; font-variant-numeric:tabular-nums; }
 .system-coordinates { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
 .system-coordinates input { display:block; margin-top:5px; }
