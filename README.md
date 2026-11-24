@@ -16,7 +16,7 @@ Select a question type and click Generate a new question. For single-variable ex
 
 ## Try the comparison
 
-In gradual mode, record an attempt and request one step. Switch to the full worked example and start again to see the same sequence together. After solving each practice item, try its paired exercise independently. Each mode can be run with the extra equation checker disabled. To compare testers on this computer, enter P01 before starting the first session and P02 for the second tester. Open Live results in a separate tab. It refreshes every two seconds and shows one row per labelled session. The first and latest independent results refer to the assigned paired item. Leave the code blank for practice outside the dashboard. The [walkthrough](docs/INSPECTION.md) describes the controls.
+In gradual mode, request one step whenever you need help. Switch to the full worked example and start again to see the same sequence together. After solving each practice item, try its paired exercise independently. Each mode can be run with the extra equation checker disabled. To compare testers on this computer, enter P01 before starting the first session and P02 for the second tester. Open Live results in a separate tab. It refreshes every two seconds and shows one row per labelled session. The first and latest independent results refer to the assigned paired item. Leave the code blank for practice outside the dashboard. The [walkthrough](docs/INSPECTION.md) describes the controls.
 
 ## Implementation and evidence
 

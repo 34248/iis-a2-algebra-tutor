@@ -30,8 +30,8 @@ class TraceChecks(unittest.TestCase):
         p=Path(self.tmp.name)/'file';p.write_text('not a directory')
         with patch.object(telemetry,'DATA_DIR',p):d=self.start()
         self.assertFalse(app.export_trace({'session':d['session']})['local_file_saved'])
-    def test_invalid_hint_is_recorded_as_no_step_release(self):
-        d=self.start();app.action({'session':d['session'],'action':'hint'})
+    def test_unavailable_hint_is_recorded_as_no_step_release(self):
+        d=self.start();app.action({'session':d['session'],'action':'hint','unavailable':True})
         rows=list(csv.DictReader(io.StringIO(app.export_trace({'session':d['session']})['csv'])))
         self.assertEqual(rows[-1]['shown_steps'],'0')
 

@@ -24,7 +24,7 @@ function render() {
     const row = document.createElement('tr');
     const values = [s.tester,new Date(s.started).toLocaleString(),s.problem,
       s.mode === 'gradual' ? label('Step hints','逐步提示') : label('Full example','完整例题'),
-      s.attempts,s.shown,outcome(s.practice),s.partner,outcome(s.independent_first),outcome(s.independent_latest),
+      s.attempts,s.shown,outcome(s.practice),outcome(s.independent_first),outcome(s.independent_latest),
       label(...(ratings[s.help_rating] || ['Not rated','未评价']))];
     for (const value of values) row.insertCell().textContent = value;
     return row;

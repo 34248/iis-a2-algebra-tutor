@@ -7,9 +7,9 @@ class TutorChecks(unittest.TestCase):
         app.SESSIONS.clear();self.quiet=patch.object(app,'log_context',lambda p:None);self.quiet.start();self.addCleanup(self.quiet.stop)
     def start(self,**kw):return app.start({'problem_id':'A01','question':'2x + 3 = 11',**kw})
     def act(self,d,action,**kw):return app.action({'session':d['session'],'action':action,**kw})
-    def test_gradual_does_not_disclose_without_attempt(self):
-        d=self.start();self.assertEqual(d['steps'],[]);self.assertEqual(self.act(d,'hint')['steps'],[])
-    def test_attempt_unlocks_one_step_at_a_time(self):
+    def test_gradual_first_hint_requires_only_a_request(self):
+        d=self.start();self.assertEqual(d['steps'],[]);first=self.act(d,'hint');self.assertEqual(first['shown'],1);self.assertEqual(first['attempt_count'],0)
+    def test_attempt_then_one_step_at_a_time(self):
         d=self.start();self.act(d,'attempt',attempt='Subtract 3');self.assertEqual(self.act(d,'hint')['shown'],1);self.assertEqual(self.act(d,'hint')['shown'],2)
     def test_conditions_share_identical_checked_content(self):
         for p in app.PROBLEMS.values():
@@ -25,12 +25,12 @@ class TutorChecks(unittest.TestCase):
         fixed=self.start(question='2x + = 11');self.assertEqual(fixed['shown'],0)
     def test_corrected_input_can_restart(self):
         self.start(question='2x + = 11');d=self.start();self.act(d,'attempt',attempt='Subtract 3');self.assertEqual(self.act(d,'hint')['shown'],1)
-    def test_empty_attempt_does_not_unlock(self):
+    def test_empty_attempt_is_not_counted(self):
         d=self.start()
         with self.assertRaises(app.UserError):self.act(d,'attempt',attempt='  ')
-        self.assertEqual(self.act(d,'hint')['shown'],0)
+        self.assertEqual(self.act(d,'hint')['attempt_count'],0)
     def test_sessions_do_not_share_progress(self):
-        a=self.start();b=self.start();self.act(a,'attempt',attempt='Subtract');self.act(a,'hint');self.assertEqual(self.act(b,'hint')['shown'],0)
+        a=self.start();b=self.start();self.act(a,'attempt',attempt='Subtract');self.act(a,'hint');self.assertEqual(self.act(b,'hint')['shown'],1);self.assertEqual(self.act(a,'hint')['shown'],2)
     def test_unavailable_keeps_existing_progress(self):
         a=self.start();self.act(a,'attempt',attempt='Subtract');self.act(a,'hint');d=self.act(a,'hint',unavailable=True);self.assertEqual(d['shown'],1);self.assertIn('unavailable',d['reply'])
     def test_malformed_model_does_not_release_steps(self):

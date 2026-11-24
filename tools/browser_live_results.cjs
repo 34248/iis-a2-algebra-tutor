@@ -48,9 +48,9 @@ const assert = require('node:assert/strict');
     }
     await observer.selectOption('#tester-filter','P01');
     const row = observer.locator('#rows tr');
-    await row.locator('td').nth(9).filter({hasText:'Correct / 正确'}).waitFor();
+    await row.locator('td').nth(8).filter({hasText:'Correct / 正确'}).waitFor();
     assert.equal(await row.count(),1);
-    assert.match(await row.locator('td').nth(8).innerText(),/Incorrect/);
+    assert.match(await row.locator('td').nth(7).innerText(),/Incorrect/);
     assert.equal(await row.locator('td').nth(5).innerText(),'1');
     for (const [value, text] of [['not_viewed','没看步骤'],['somewhat','有一点帮助']]) {
       await a.selectOption('#rating',value);
@@ -60,7 +60,7 @@ const assert = require('node:assert/strict');
     }
     await observer.selectOption('#tester-filter','03');
     assert.match(await row.locator('td').last().innerText(),/未评价/);
-    assert.equal(await row.locator('td').nth(8).innerText(),'—');
+    assert.equal(await row.locator('td').nth(7).innerText(),'—');
     await observer.reload();
     await observer.waitForFunction(()=>document.querySelectorAll('#rows tr').length===2);
     console.log('PASS: two testers, live refresh without reloading, filtering, first and latest paired scores.');

@@ -88,7 +88,7 @@ def public(state, reply=''):
         'attempt_count': len(state['attempts']),
         'events': copy.deepcopy(state['events']),
         'next_hint_allowed': (state['status'] == 'ready' and
-                              bool(state['attempts']) and
+                              state['condition'] == 'gradual' and
                               len(state['steps']) < len(problem['steps'])),
         'simulated': True,
         'step_feedback': copy.deepcopy(state['step_feedback']),
@@ -181,8 +181,7 @@ def _start(payload):
         return public(state)
     if condition == 'immediate':
         return run_model(state, len(PROBLEMS[pid]['steps']))
-    state['reply'] = ('Try a step first. Your attempt unlocks the first hint; '
-                      'it is recorded, not automatically graded.')
+    state['reply'] = 'You can try a step or reveal the next hint now.'
     return public(state)
 
 
@@ -214,8 +213,6 @@ def _action(payload):
                           'unchanged. Retry when available.')
         if state['condition'] != 'gradual':
             return public(state, 'All checked steps are already visible in immediate mode.')
-        if not state['attempts']:
-            return public(state, 'Enter an attempt before requesting a hint. No steps were released.')
         state['events'].append('Requested one next hint.')
         return run_model(state, min(len(state['steps']) + 1,
                                     len(PROBLEMS[state['problem_id']]['steps'])))

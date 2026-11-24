@@ -39,7 +39,7 @@ function syncControls() {
   $('start').disabled = busy || !config;
   $('save-attempt').disabled = $('check-answer').disabled =
     busy || !current || current.status !== 'ready';
-  $('hint').disabled = busy || !current || !current.next_hint_allowed;
+  $('hint').disabled = busy || !config || (current ? !current.next_hint_allowed : $('condition').value !== 'gradual');
   $('transfer-check').disabled = busy || !config;
   $('rating').disabled = busy;
   $('save-rating').disabled = busy || !pairedAnswerSubmitted || !$('rating').value || $('rating').value === savedRating;
@@ -55,7 +55,7 @@ function render(result) {
   $('reply').dataset.status = result.solved ? 'good' : result.status === 'blocked' ? 'warn' : '';
   $('current-equation').textContent = result.question_received;
   $('practice-state').textContent = result.status === 'blocked' ? 'Check input' : result.solved ? 'Solved' : 'In progress';
-  $('progress').textContent = (result.condition === 'gradual' ? 'Try first' : 'Worked solution') +
+  $('progress').textContent = (result.condition === 'gradual' ? 'Step hints' : 'Worked solution') +
     ` · ${result.attempt_count} attempt${result.attempt_count === 1 ? '' : 's'} recorded`;
   $('steps').replaceChildren(...result.steps.map(step => node('li', step)));
   $('steps-empty').hidden = result.shown > 0;
@@ -154,12 +154,12 @@ function resetPractice(message) {
   syncControls();
 }
 
-bind('start', async () => {
+async function startPractice(fresh) {
   // Clear before waiting, preserving anything typed during the request.
   const code = $('tester').value.trim();
   if (!/^[a-zA-Z0-9]{0,6}$/.test(code)) throw Error('Use up to 6 letters or digits, or leave the code blank.');
   $('tester').value = code.toUpperCase();
-  resetPractice('Starting a new practice session.');
+  if (fresh) resetPractice('Starting a new practice session.');
   render(await api('/api/start', {
     problem_id: $('problem').value,
     question: $('equation').value,
@@ -172,7 +172,8 @@ bind('start', async () => {
   if (matchMedia('(max-width: 700px)').matches) {
     $('practice').scrollIntoView({behavior: 'smooth', block: 'start'});
   }
-});
+}
+bind('start', () => startPractice(true));
 
 bind('save-attempt', async () => {
   checkedWorking = null;
@@ -226,9 +227,12 @@ bind('check-step', async () => {
   }
 });
 
-bind('hint', async () => render(await api('/api/action', {
-  session, action: 'hint', unavailable: $('unavailable').checked,
-})));
+bind('hint', async () => {
+  if (!current) await startPractice(false);
+  if (current.next_hint_allowed) {
+    render(await api('/api/action', {session, action: 'hint', unavailable: $('unavailable').checked}));
+  }
+});
 
 bind('check-answer', async () => {
   const submitted = $('answer').value;
@@ -298,7 +302,7 @@ $('attempt').addEventListener('input', () => {
 });
 $('condition').addEventListener('change', () => {
   $('mode-description').textContent = $('condition').value === 'gradual'
-    ? 'Write your first attempt to unlock a hint.'
+    ? 'You can try a step or reveal the next hint now.'
     : 'The same checked steps appear together. You can still check your own working.';
 });
 $('try-independent').addEventListener('click', () => {
@@ -411,7 +415,7 @@ function installBilingualView() {
     'How would you like help?': '你希望怎样获得帮助？',
     'Try first · step hints': '先尝试，逐步看提示',
     'Full worked example': '查看完整例题',
-    'Write your first attempt to unlock a hint.': '先写一步并提交，即可解锁提示。',
+    'You can try a step or reveal the next hint now.': '可以先自己做，也可以直接查看下一步。',
     'The same checked steps appear together. You can still check your own working.': '一次展示完整步骤，你也可以检查自己的解法。',
     'Start practice': '开始练习',
     'Start fresh': '重新开始',
@@ -469,7 +473,6 @@ function installBilingualView() {
     'Problem changed. Start a new practice session.': '题目已更改，请开始新练习。',
     'Answer changed. Check it when ready.': '答案已修改，可以重新检查。',
     'Working changed. Check your equation or record your explanation.': '步骤已修改，可以检查方程或记录思路。',
-    'Try a step first. Your attempt unlocks the first hint; it is recorded, not automatically graded.': '先写一步并提交，就能解锁第一条提示。系统会记录这次尝试。',
     'Attempt recorded. Select Next hint when you want one checked step.': '思路已记录。需要帮助时，点「查看下一步」。',
     'Checked steps are shown below. This is a fixed-content tutor simulation.': '下方显示已核对的步骤，来自这道题预先编写的解法。',
     'Equivalent equation: this line keeps the same solution. Continue with your own next step.': '变形正确，方程仍然同解。接着试试下一步。',
@@ -490,7 +493,7 @@ function installBilingualView() {
       '第 ' + n + ' 行 · ' + ({'correct':'正确','changes the solution':'改变了原解','cannot check':'无法判断'})[status]],
     [/^([AT]\d+) · (Warm-up|Multi-step|Signed numbers|Fractions|Challenge)$/, (_, id, topic) => ({'Challenge':'挑战题','Warm-up':'基础题','Multi-step':'多步运算','Signed numbers':'正负数','Fractions':'分数'})[topic]],
     [/^(\d+) of (\d+) shown$/, (_, n, total) => '已显示 ' + n + ' / ' + total + ' 步'],
-    [/^(Try first|Worked solution) · (\d+) attempts? recorded$/, (_, mode, n) => (mode === 'Try first' ? '先尝试' : '完整例题') + '，已记录 ' + n + ' 次尝试'],
+    [/^(Step hints|Worked solution) · (\d+) attempts? recorded$/, (_, mode, n) => (mode === 'Step hints' ? '逐步提示' : '完整例题') + '，已记录 ' + n + ' 次尝试'],
     [/^(\d+) equation checks? · (\d+) valid answer checks?$/, (_, a, b) => '方程检查 ' + a + ' 次，答案检查 ' + b + ' 次'],
     [/^(\d+) valid answer checks? · (\d+) of (\d+) worked steps viewed\. Try the paired question next\.$/, (_, a, b, c) => '检查答案 ' + a + ' 次，看过 ' + b + ' / ' + c + ' 步。接下来试试配对的新题。'],
     [/^(Subtract|Add) (.+?) (?:from|to) both sides: (.+)\.$/, (_, op, v, eq) => '两边都' + (op === 'Add' ? '加上 ' : '减去 ') + v + '，得到 ' + eq + '。'],
