@@ -31,7 +31,7 @@ function fail(error) {
 }
 
 function syncControls() {
-  for (const id of ['problem', 'equation', 'condition', 'version', 'transfer', 'equation-feedback','difficulty','generate','tester']) {
+  for (const id of ['topic', 'problem', 'equation', 'condition', 'version', 'transfer', 'equation-feedback','difficulty','generate','tester']) {
     $(id).disabled = busy || !config;
   }
   $('start').disabled = busy || !config;
@@ -248,11 +248,7 @@ for (const id of ['condition', 'version', 'equation', 'equation-feedback', 'test
 let singleProblemId;
 $('problem').addEventListener('change', () => {
   const selected = $('problem').value;
-  const systemSelected = selected === 'two-variable';
-  document.querySelector('.workspace').classList.toggle('system-active', systemSelected);
-  $('two-variable').hidden = !systemSelected;
-  $('problem').setAttribute('aria-describedby', systemSelected ? 'system-title' : 'problem-kind');
-  if (systemSelected || selected === singleProblemId) return;
+  if (selected === singleProblemId) return;
   singleProblemId = selected;
   const item = config.problems.find(item => item.id === selected);
   $('equation').value = item.question;
@@ -296,7 +292,7 @@ for (const [field, button] of [['answer', 'check-answer'], ['transfer-answer', '
 }
 syncControls();
 function addOption(select, item, currentOnly = false) {
-  const option = node('option', currentOnly ? 'Current generated question' : item.id + ' · ' + item.difficulty);
+  const option = node('option', currentOnly ? 'Generated' : select.id === 'problem' ? item.id : item.id + ' · ' + item.difficulty);
   option.value = item.id;
   option.hidden = currentOnly;
   if (currentOnly) select.querySelector('option[hidden]')?.remove();
@@ -309,22 +305,40 @@ function fillCatalogue(select, items) {
   }
 }
 
+function selectTopic(preferredId) {
+  const topic = $('topic').value;
+  const systemSelected = topic === 'two-variable';
+  document.querySelector('.workspace').classList.toggle('system-active', systemSelected);
+  $('two-variable').hidden = !systemSelected;
+  if (systemSelected) return;
+  const select = $('problem');
+  const items = config.problems.filter(item => item.difficulty === topic);
+  select.replaceChildren();
+  fillCatalogue(select, items);
+  const preferred = items.find(item => item.id === preferredId);
+  if (preferred) {
+    if (preferred.id.startsWith('G')) addOption(select, preferred, true);
+    select.value = preferred.id;
+  }
+  select.dispatchEvent(new Event('change'));
+}
+$('topic').addEventListener('change', () => selectTopic(singleProblemId));
+
 bind('generate', async () => {
   $('generation-status').textContent = '';
   const pair = await api('/api/generate', {difficulty: $('difficulty').value});
   config.problems.push(pair.practice);
   config.transfer.push(pair.partner);
-  addOption($('problem'), pair.practice, true);
   addOption($('transfer'), pair.partner, true);
-  $('problem').value = pair.practice.id;
-  $('problem').dispatchEvent(new Event('change'));
+  $('topic').value = pair.practice.difficulty;
+  selectTopic(pair.practice.id);
   $('generation-status').textContent = 'Saved on this computer. Select Start practice to begin.';
 });
 $('problem').addEventListener('change', () => { $('generation-status').textContent = ''; });
 function selectLinkedChallenge() {
   if (!config || location.hash !== '#two-variable') return;
-  $('problem').value = 'two-variable';
-  $('problem').dispatchEvent(new Event('change'));
+  $('topic').value = 'two-variable';
+  selectTopic();
   history.replaceState(null, '', location.pathname + location.search);
 }
 window.addEventListener('hashchange', selectLinkedChallenge);
@@ -333,24 +347,43 @@ window.addEventListener('hashchange', selectLinkedChallenge);
     const response = await fetch('/api/config');
     if (!response.ok) throw Error('Could not load the checked practice items. Reload to retry.');
     const loaded = await response.json();
-    fillCatalogue($('problem'), loaded.problems);
     fillCatalogue($('transfer'), loaded.transfer);
     config = loaded;
     $('generator').hidden = !loaded.local_generation;
     document.querySelector('.catalog-size').replaceChildren(
-      node('span', $('problem').length + ' practice items'), document.createElement('br'),
+      node('span', loaded.problems.filter(item => !item.id.startsWith('G')).length + ' practice items'), document.createElement('br'),
       node('span', $('transfer').length + ' new questions without hints'));
-    $('problem').add(new Option('Two-variable challenge', 'two-variable'));
-    singleProblemId = $('problem').value;
+    selectTopic();
     selectLinkedChallenge();
-    $('problem-kind').textContent = topicNote(loaded.problems[0].difficulty);
-    $('current-equation').textContent = loaded.problems[0].question;
     resetUnassisted();
     syncControls();
   } catch (error) {
     fail(error);
   }
 })();
+
+// Positive coefficients for x and opposite signs for y guarantee one intersection.
+let system;
+function newSystem() {
+  const integer = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
+  const a = integer(2, 7), b = integer(2, 7), c = integer(2, 7), d = integer(2, 7);
+  let x = integer(-8, 8);
+  if (system && x === system.x) x = x === 8 ? -8 : x + 1;
+  const y = integer(-8, 8);
+  const firstTotal = a * x + b * y;
+  const secondTotal = c * x - d * y;
+  system = {a, b, c, d, x, firstTotal, secondTotal};
+  $('system-first').textContent = a + 'x + ' + b + 'y = ' + firstTotal;
+  $('system-second').textContent = c + 'x − ' + d + 'y = ' + secondTotal;
+  $('elimination-formula').textContent = d + ' × ① + ' + b + ' × ②  ⇒  ' +
+    (d * a + b * c) + 'x = ' + (d * firstTotal + b * secondTotal);
+  $('substitution-formula').textContent = 'y = (' + firstTotal + ' − ' + a + 'x) / ' + b;
+  $('system-answer').reset();
+  $('system-feedback').hidden = true;
+  for (const hint of $('two-variable').querySelectorAll('details')) hint.open = false;
+}
+$('new-system').addEventListener('click', newSystem);
+newSystem();
 
 // Keep typed decimals and fractions exact when substituting in both equations.
 function coordinate(value) {
@@ -379,8 +412,8 @@ $('system-answer').addEventListener('submit', event => {
   const scale = x[1] * y[1];
   const scaledX = x[0] * y[1];
   const scaledY = y[0] * x[1];
-  const first = 3n * scaledX + 2n * scaledY === 7n * scale;
-  const second = 2n * scaledX - 3n * scaledY === 9n * scale;
+  const first = BigInt(system.a) * scaledX + BigInt(system.b) * scaledY === BigInt(system.firstTotal) * scale;
+  const second = BigInt(system.c) * scaledX - BigInt(system.d) * scaledY === BigInt(system.secondTotal) * scale;
   if (first && second) {
     feedback.dataset.status = 'good';
     feedback.textContent = 'Correct. Your pair satisfies both equations.';
@@ -403,14 +436,16 @@ function installBilingualView() {
     'Starting again creates a separate practice record.': '重新开始会单独记录一次练习。',
     'New question difficulty': '新题难度',
     'Basic': '基础', 'Multi-step': '多步', 'Challenge': '挑战',
-    'Current generated question': '当前生成题',
+    'Generated': '生成题', 'Question type': '题型', 'Signed numbers': '正负数',
+    'Fractions': '分数', 'Two variables': '二元', 'New system': '换一题',
+    'Step hints': '逐步提示', 'Full example': '完整例题',
     'Generate a new question': '生成新题',
     'Two-variable challenge': '二元方程组挑战',
     'Find the pair that satisfies both equations.': '求同时满足两个方程的 x 和 y。',
     'Elimination hint': '消元法提示',
     'Substitution hint': '代入法提示',
-    'Multiply the first equation by 3 and the second by 2. Add the results to cancel y.': '第一个方程乘以 3，第二个乘以 2，再把两个方程相加消去 y。',
-    'From the first equation, y = (7 − 3x)/2. Substitute this expression for y in the second equation.': '由第一个方程得到 y = (7 − 3x)/2，再把第二个方程中的 y 换成这个式子。',
+    'Scale the two equations as shown, then add them to eliminate y.': '按下面的倍数分别乘第一式和第二式，相加消去 y。',
+    'Use the first equation to express y, then substitute into the second.': '用第一式表示 y，再代入第二式。',
     'Check both equations': '检验两个方程',
     'Extra practice outside the two help modes. Answers stay on this page.': '这是两种提示模式之外的额外练习，答案只在本页核对。',
     'Enter a number or a fraction with a nonzero denominator for each variable.': '请为 x 和 y 各填一个数；若填分数，分母须非零。',
@@ -424,7 +459,7 @@ function installBilingualView() {
     'Thirteen practice equations each have a paired independent question. The challenge set combines fractions, brackets and variables on both sides. The checker and worked steps run locally.': '13 道练习题各配一道独立题。挑战题结合分数、括号及两边含未知数的方程。所有检查和提示均在本机运行。',
     '← Algebra practice': '← 返回代数练习',
     'Offline tutor': '离线辅导说明',
-    'Linear equations': '一元一次方程',
+    'Linear equations': '一次方程',
     'Choose a question and how much help you want.': '选一道题，再选你希望怎样获得帮助。',
     '13 practice items': '13 道练习题',
     '13 new questions without hints': '13 道无提示新题',

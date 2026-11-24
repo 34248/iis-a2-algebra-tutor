@@ -1,6 +1,6 @@
 # Controlled help in algebra practice
 
-README prose word count: 548 (excluding headings and commands).
+README prose word count: 556 (excluding headings and commands).
 
 ## Run the tutor
 
@@ -10,11 +10,11 @@ Open run.cmd on Windows, or run the following from this directory with Python 3.
 python app.py --port 8769 --open
 ```
 
-Choose a problem and a help mode, then start. A10 through A13 combine denominators, nested brackets, decimal coefficients and variables on both sides. Submit a line such as “Multiply both sides by 12: 3(3x - 2) - 2(x + 1) = 4(x - 1)” on A10. Use a space or a line break between complete equations and press Check my steps. Each step is compared with the original equation. On desktop, hints appear to the right. The paired independent exercise opens after the final answer is correct. Written explanations can also be recorded without a score. The language button switches between English and bilingual English–Chinese labels.
+Choose a question type, then select a problem and a help mode. A10 through A13 combine denominators, nested brackets, decimal coefficients and variables on both sides. Submit a line such as “Multiply both sides by 12: 3(3x - 2) - 2(x + 1) = 4(x - 1)” on A10. Use a space or a line break between complete equations and press Check my steps. Each step is compared with the original equation. On desktop, hints appear to the right. The paired independent exercise opens after the final answer is correct. Written explanations can also be recorded without a score. The language button switches between English and bilingual English–Chinese labels.
 
 To add a pair, choose Basic, Multi-step or Challenge and select Generate a new question. The tutor samples coefficients locally, verifies each step and both answers, and saves the pair under data/generated. Switch help mode to inspect the same problem again. The menus list only the built-in questions. Each newly generated pair opens for the current practice.
 
-For extra practice, select Two-variable challenge from Choose a problem. Try elimination or substitution and check the two coordinates against both equations. This exercise sits outside the recorded comparison.
+For extra practice, choose Two variables under Question type. Select New system for another random pair of equations. The hints and coordinate checks use the current equations. This exercise sits outside the recorded comparison.
 
 ## Try the comparison
 

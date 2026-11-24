@@ -35,8 +35,11 @@ main > .language-switch { float: right; margin: 0 0 8px 10px; }
 .line-results li { padding:4px 0; }
 .line-results [data-status=good] { color:var(--good); }
 .line-results [data-status=warn] { color:var(--warn); }
+@media (min-width:701px) and (max-width:899px) {
+  .workspace { grid-template-columns:18rem minmax(0,1fr); }
+}
 @media (min-width:900px) {
-  .workspace { grid-template-columns:minmax(190px,.68fr) minmax(0,3fr); }
+  .workspace { grid-template-columns:minmax(18rem,25%) minmax(0,1fr); }
   .learning { grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); }
 }
 
@@ -52,6 +55,7 @@ main > .language-switch { float: right; margin: 0 0 8px 10px; }
 .system-challenge form { max-width:520px; }
 .system-equations { margin:20px 0; padding:7px 16px; border-left:3px solid var(--accent); }
 .system-challenge details { padding:10px 0; border-bottom:1px solid var(--line); }
+#new-system { margin-bottom:8px; }
 .system-challenge summary { color:var(--accent); cursor:pointer; }
 .system-coordinates { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
 .system-coordinates input { display:block; margin-top:5px; }
