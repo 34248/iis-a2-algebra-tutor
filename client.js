@@ -310,12 +310,7 @@ function fillCatalogue(select, items) {
 
 function selectTopic(preferredId) {
   const topic = $('topic').value;
-  const systemSelected = topic === 'two-variable';
-  document.querySelector('.workspace').classList.toggle('system-active', systemSelected);
-  $('two-variable').hidden = !systemSelected;
-  $('system-hints').hidden = !systemSelected;
   $('generation-status').textContent = '';
-  if (systemSelected) return;
   const select = $('problem');
   const items = config.problems.filter(item => item.difficulty === topic);
   select.replaceChildren();
@@ -332,10 +327,6 @@ $('topic').addEventListener('change', () => selectTopic(singleProblemId));
 bind('generate', async () => {
   $('generation-status').textContent = '';
   const topic = $('topic').value;
-  if (topic === 'two-variable') {
-    newSystem();
-    return;
-  }
   const pair = await api('/api/generate', {difficulty: topic});
   config.problems.push(pair.practice);
   config.transfer.push(pair.partner);
@@ -345,13 +336,6 @@ bind('generate', async () => {
   $('generation-status').textContent = 'Saved on this computer. Select Start practice to begin.';
 });
 $('problem').addEventListener('change', () => { $('generation-status').textContent = ''; });
-function selectLinkedChallenge() {
-  if (!config || location.hash !== '#two-variable') return;
-  $('topic').value = 'two-variable';
-  selectTopic();
-  history.replaceState(null, '', location.pathname + location.search);
-}
-window.addEventListener('hashchange', selectLinkedChallenge);
 (async () => {
   try {
     const response = await fetch('/api/config');
@@ -364,140 +348,12 @@ window.addEventListener('hashchange', selectLinkedChallenge);
       node('span', loaded.problems.filter(item => !item.id.startsWith('G')).length + ' practice items'), document.createElement('br'),
       node('span', $('transfer').length + ' new questions without hints'));
     selectTopic();
-    selectLinkedChallenge();
     resetUnassisted();
     syncControls();
   } catch (error) {
     fail(error);
   }
 })();
-
-// Positive coefficients for x and opposite signs for y guarantee one intersection.
-let system;
-let shownSystemSteps = 0;
-let systemAttemptSubmitted = false;
-
-function systemSteps() {
-  const {a, b, c, d, x, y, firstTotal: r, secondTotal: s} = system;
-  const k = a*d + b*c;
-  const total = d*r + b*s;
-  const steps = $('system-method').value === 'elimination' ? [
-    ['Scale the first equation', `① × ${d}  ⇒  ${a*d}x + ${b*d}y = ${d*r}`],
-    ['Scale the second equation', `② × ${b}  ⇒  ${b*c}x − ${b*d}y = ${b*s}`],
-    ['Add the equations to cancel y', `(${a*d} + ${b*c})x = ${d*r} + (${b*s})  ⇒  ${k}x = ${total}`],
-  ] : [
-    ['Express y using the first equation', `y = (${r} − ${a}x) / ${b}`],
-    ['Replace y in the second equation', `${c}x − ${d} × ((${r} − ${a}x) / ${b}) = ${s}`],
-    ['Clear the denominator', `${b*c}x − ${d}(${r} − ${a}x) = ${b*s}`],
-    ['Expand and collect the x terms', `(${b*c} + ${d*a})x = ${b*s} + (${d*r})  ⇒  ${k}x = ${total}`],
-  ];
-  steps.push(
-    ['Solve for x', `x = ${total} / ${k} = ${x}`],
-    ['Put x back into the first equation', `${a} × (${x}) + ${b}y = ${r}  ⇒  ${b}y = ${r-a*x}`],
-    ['Solve for y', `y = ${r-a*x} / ${b} = ${y}`],
-    ['Check the pair in both equations', `①  ${a} × (${x}) + ${b} × (${y}) = ${r}     ②  ${c} × (${x}) − ${d} × (${y}) = ${s}`]
-  );
-  return steps;
-}
-
-function renderSystemSteps() {
-  const gradual = $('system-mode').value === 'gradual';
-  const steps = systemSteps();
-  const count = gradual ? shownSystemSteps : steps.length;
-  $('system-steps').replaceChildren(...steps.slice(0, count).map(([label, equation]) => {
-    const item = document.createElement('li');
-    item.append(node('span', label), node('div', equation));
-    return item;
-  }));
-  $('system-count').textContent = count + ' of ' + steps.length + ' shown';
-  $('system-working').hidden = !gradual;
-  $('system-instruction').textContent = systemAttemptSubmitted ? 'Select Reveal next step to continue.' : 'Write your first attempt to unlock a hint.';
-  $('system-instruction').hidden = count === steps.length;
-  $('system-submit').hidden = systemAttemptSubmitted;
-  $('system-submit').disabled = !$('system-attempt').value.trim();
-  $('system-next').hidden = !gradual;
-  $('system-next').disabled = !systemAttemptSubmitted || count >= steps.length;
-}
-
-$('system-attempt').addEventListener('input', () => {
-  $('system-submit').disabled = !$('system-attempt').value.trim();
-});
-$('system-submit').addEventListener('click', () => {
-  systemAttemptSubmitted = true;
-  renderSystemSteps();
-  $('system-next').focus();
-});
-$('system-next').addEventListener('click', () => {
-  shownSystemSteps++;
-  renderSystemSteps();
-});
-$('system-mode').addEventListener('change', renderSystemSteps);
-$('system-method').addEventListener('change', () => {
-  shownSystemSteps = 0;
-  renderSystemSteps();
-});
-
-function newSystem() {
-  const integer = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
-  const a = integer(2, 7), b = integer(2, 7), c = integer(2, 7), d = integer(2, 7);
-  let x = integer(-8, 8);
-  if (system && x === system.x) x = x === 8 ? -8 : x + 1;
-  const y = integer(-8, 8);
-  const firstTotal = a * x + b * y;
-  const secondTotal = c * x - d * y;
-  system = {a, b, c, d, x, y, firstTotal, secondTotal};
-  $('system-first').textContent = a + 'x + ' + b + 'y = ' + firstTotal;
-  $('system-second').textContent = c + 'x − ' + d + 'y = ' + secondTotal;
-  shownSystemSteps = 0;
-  systemAttemptSubmitted = false;
-  $('system-attempt').value = '';
-  renderSystemSteps();
-  $('system-answer').reset();
-  $('system-feedback').hidden = true;
-}
-newSystem();
-
-// Keep typed decimals and fractions exact when substituting in both equations.
-function coordinate(value) {
-  const text = value.trim().replaceAll('−', '-');
-  const fraction = /^([+-]?\d+)\s*\/\s*([+-]?\d+)$/.exec(text);
-  if (fraction) {
-    const denominator = BigInt(fraction[2]);
-    return denominator === 0n ? null : [BigInt(fraction[1]), denominator];
-  }
-  if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(text)) return null;
-  const places = (text.split('.')[1] || '').length;
-  return [BigInt(text.replace('.', '')), 10n ** BigInt(places)];
-}
-
-$('system-answer').addEventListener('submit', event => {
-  event.preventDefault();
-  const x = coordinate($('system-x').value);
-  const y = coordinate($('system-y').value);
-  const feedback = $('system-feedback');
-  feedback.hidden = false;
-  feedback.dataset.status = 'warn';
-  if (!x || !y) {
-    feedback.textContent = 'Enter a number or a fraction with a nonzero denominator for each variable.';
-    return;
-  }
-  const scale = x[1] * y[1];
-  const scaledX = x[0] * y[1];
-  const scaledY = y[0] * x[1];
-  const first = BigInt(system.a) * scaledX + BigInt(system.b) * scaledY === BigInt(system.firstTotal) * scale;
-  const second = BigInt(system.c) * scaledX - BigInt(system.d) * scaledY === BigInt(system.secondTotal) * scale;
-  if (first && second) {
-    feedback.dataset.status = 'good';
-    feedback.textContent = 'Correct. Your pair satisfies both equations.';
-  } else if (first) {
-    feedback.textContent = 'The first equation balances. Check the second.';
-  } else if (second) {
-    feedback.textContent = 'The second equation balances. Check the first.';
-  } else {
-    feedback.textContent = 'Check both equations. Substitute your x and y in each one.';
-  }
-});
-$('system-answer').addEventListener('input', () => { $('system-feedback').hidden = true; });
 
 function installBilingualView() {
   const labels = new Map(Object.entries({
@@ -506,39 +362,18 @@ function installBilingualView() {
     'Use up to 6 letters or digits, or leave the code blank.': '请填写最多 6 位英文字母或数字，也可留空。',
     'Live results': '实时结果',
     'Starting again creates a separate practice record.': '重新开始会单独记录一次练习。',
-    'Hints': '解题提示',
     'Basic': '基础', 'Multi-step': '多步', 'Challenge': '挑战',
     'Generated': '生成题', 'Question type': '题型', 'Signed numbers': '正负数',
-    'Fractions': '分数', 'Two variables': '二元',
+    'Fractions': '分数',
     'Step hints': '逐步提示', 'Full example': '完整例题',
     'Generate a new question': '生成新题',
-    'Two-variable challenge': '二元方程组挑战',
-    'Find the pair that satisfies both equations.': '求同时满足两个方程的 x 和 y。',
-    'Solution method': '解法', 'Elimination': '消元法', 'Substitution': '代入法',
-    'Submit first attempt': '提交第一步', 'Select Reveal next step to continue.': '点击「查看下一步」继续。',
-    'Scale the first equation': '把第一式两边同乘一个数',
-    'Scale the second equation': '把第二式两边同乘一个数',
-    'Add the equations to cancel y': '两式相加，消去 y',
-    'Express y using the first equation': '从第一式解出 y 的表达式',
-    'Replace y in the second equation': '把 y 的表达式代入第二式',
-    'Clear the denominator': '两边同乘分母，去分母',
-    'Expand and collect the x terms': '展开括号并合并含 x 的项',
-    'Put x back into the first equation': '把 x 的值代回第一式',
-    'Solve for y': '求出 y', 'Check the pair in both equations': '把这组解代回两个方程检验',
-    'Check both equations': '检验两个方程',
-    'Extra practice. Answers stay on this page.': '这是额外练习，答案只在本页核对。',
-    'Enter a number or a fraction with a nonzero denominator for each variable.': '请为 x 和 y 各填一个数；若填分数，分母须非零。',
-    'Correct. Your pair satisfies both equations.': '答对了，这组数同时满足两个方程。',
-    'The first equation balances. Check the second.': '第一个方程成立，请检查第二个。',
-    'The second equation balances. Check the first.': '第二个方程成立，请检查第一个。',
-    'Check both equations. Substitute your x and y in each one.': '两个方程都不成立，请分别代入 x 和 y 检查。',
     'Saved on this computer. Select Start practice to begin.': '题目已保存在本机，点击「开始练习」即可作答。',
     'Algebra practice': '代数练习',
     'Practise clearing denominators, nested brackets and decimal coefficients.': '综合练习去分母、嵌套括号和小数系数。',
     'Thirteen practice equations each have a paired independent question. The challenge set combines fractions, brackets and variables on both sides. The checker and worked steps run locally.': '13 道练习题各配一道独立题。挑战题结合分数、括号及两边含未知数的方程。所有检查和提示均在本机运行。',
     '← Algebra practice': '← 返回代数练习',
     'Offline tutor': '离线辅导说明',
-    'Linear equations': '一次方程',
+    'Linear equations': '一元一次方程',
     'Choose a question and how much help you want.': '选一道题，再选你希望怎样获得帮助。',
     '13 practice items': '13 道练习题',
     '13 new questions without hints': '13 道无提示新题',

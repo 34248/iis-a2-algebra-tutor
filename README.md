@@ -1,6 +1,6 @@
 # Controlled help in algebra practice
 
-README prose word count: 570 (excluding headings and commands).
+README prose word count: 511 (excluding headings and commands).
 
 ## Run the tutor
 
@@ -13,8 +13,6 @@ python app.py --port 8769 --open
 Choose a question type, then select a problem and a help mode. A10 through A13 combine denominators, nested brackets, decimal coefficients and variables on both sides. Submit a line such as “Multiply both sides by 12: 3(3x - 2) - 2(x + 1) = 4(x - 1)” on A10. Use a space or a line break between complete equations and press Check my steps. Each step is compared with the original equation. On desktop, hints appear to the right. The paired independent exercise opens after the final answer is correct. Written explanations can also be recorded without a score. The language button switches between English and bilingual English–Chinese labels.
 
 Select a question type and click Generate a new question. For single-variable exercises, the tutor checks the steps and both answers, saves the pair under data/generated and lets you start practice in either help mode. The menus show the built-in items and the current generated question.
-
-For a system of equations, select Two variables and use the same button. Enter x and y in the workspace. Submit a first line of working to unlock one step at a time, or choose Full example. Both elimination and substitution use the current equations. The final check tests both coordinates. This extra practice sits outside the recorded comparison.
 
 ## Try the comparison
 

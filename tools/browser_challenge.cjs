@@ -56,49 +56,6 @@ const {pathToFileURL} = require('node:url');
       await page.click('#start');
       await page.waitForFunction(n=>document.querySelectorAll('#steps li').length===n,item.steps.length);
     }
-    await page.selectOption('#topic','two-variable');
-    let previousX;
-    for (let i = 0; i < 8; i++) {
-      const [a,b,r] = (await page.locator('#system-first').textContent()).match(/-?\d+/g).map(Number);
-      const [c,d,s] = (await page.locator('#system-second').textContent()).match(/-?\d+/g).map(Number);
-      const x = (d*r + b*s)/(a*d + b*c);
-      const y = (r - a*x)/b;
-      assert(Number.isInteger(x) && Number.isInteger(y));
-      assert.notEqual(x,previousX);
-      await page.fill('#system-x',String(x+1));
-      await page.fill('#system-y',String(y));
-      await page.click('#system-answer button');
-      await page.locator('#system-feedback[data-status=warn]:visible').waitFor();
-      await page.fill('#system-x',String(x));
-      await page.click('#system-answer button');
-      await page.locator('#system-feedback[data-status=good]:visible').waitFor();
-      const steps = page.locator('#system-steps li');
-      assert.equal(await steps.count(),0);
-      assert(await page.locator('#system-next').isDisabled());
-      await page.fill('#system-attempt','Multiply the first equation');
-      await page.click('#system-submit');
-      for (let n = 1; n <= 7; n++) {
-        await page.click('#system-next');
-        assert.equal(await steps.count(),n);
-      }
-      assert(await page.locator('#system-next').isDisabled());
-      assert((await steps.nth(2).textContent()).includes((a*d+b*c)+'x = '+(d*r+b*s)));
-      assert((await steps.nth(5).textContent()).endsWith('= '+y));
-      await page.selectOption('#system-method','substitution');
-      assert.equal(await steps.count(),0);
-      await page.click('#system-next');
-      assert((await steps.first().textContent()).includes('y = ('+r+' − '+a+'x) / '+b));
-      await page.selectOption('#system-mode','immediate');
-      assert.equal(await steps.count(),8);
-      await page.selectOption('#system-mode','gradual');
-      assert.equal(await steps.count(),1);
-      await page.selectOption('#system-method','elimination');
-      previousX=x;
-      await page.click('#generate');
-      assert.equal(await page.inputValue('#system-x'),'');
-    }
-    await page.selectOption('#topic','Challenge');
-    assert.equal(await page.inputValue('#problem'),'A13');
     await page.locator('.language-switch').click();
     assert(!/挑战题/.test(await page.locator('#problem').innerText()));
     await page.setViewportSize({width:390,height:844});

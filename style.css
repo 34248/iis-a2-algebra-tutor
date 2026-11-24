@@ -50,10 +50,4 @@ main > .language-switch { float: right; margin: 0 0 8px 10px; }
 .results caption { text-align:left; padding-bottom:10px; color:var(--muted); }
 .results select { max-width:250px; }
 #tester-note { min-height:0; }
-.workspace.system-active .single-only { display:none; }
 #generation-status:empty { display:none; }
-.system-challenge form { max-width:520px; }
-.system-equations { margin:20px 0; padding:7px 16px; border-left:3px solid var(--accent); }
-#system-hints .steps li > div { margin-top:4px; font-variant-numeric:tabular-nums; }
-.system-coordinates { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
-.system-coordinates input { display:block; margin-top:5px; }
