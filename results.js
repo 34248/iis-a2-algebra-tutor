@@ -25,8 +25,8 @@ function render() {
     return row;
   }));
   byId('empty').hidden = rows.length > 0 || !lastUpdate;
-  byId('empty').textContent = label('No labelled sessions yet. Enter P01 on the practice page and start a question.',
-                                    '尚无测试记录。在练习页输入 P01，再点击开始练习。');
+  byId('empty').textContent = label('No labelled sessions yet. Enter 03 on the practice page and start a question.',
+                                    '尚无测试记录。在练习页输入 03，再点击开始练习。');
   byId('sync').textContent = failed ? label('Connection lost. Retrying…','连接中断，正在重试…') :
     lastUpdate ? label('Updated every 2 seconds','每 2 秒更新') + ' · ' + lastUpdate.toLocaleTimeString() : label('Loading…','加载中…');
 }

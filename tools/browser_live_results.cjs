@@ -30,7 +30,8 @@ const assert = require('node:assert/strict');
       return p;
     }
     const a = await start('P01','gradual');
-    await start('P02','immediate');
+    await start('03','immediate');
+    await start('','gradual');
     await observer.waitForFunction(()=>document.querySelectorAll('#rows tr').length===2);
     await a.fill('#attempt','2x = 8');
     await a.click('#check-step');
@@ -49,7 +50,7 @@ const assert = require('node:assert/strict');
     assert.equal(await row.count(),1);
     assert.match(await row.locator('td').nth(8).innerText(),/Incorrect/);
     assert.equal(await row.locator('td').nth(5).innerText(),'1');
-    await observer.selectOption('#tester-filter','P02');
+    await observer.selectOption('#tester-filter','03');
     assert.equal(await row.locator('td').nth(8).innerText(),'—');
     await observer.reload();
     await observer.waitForFunction(()=>document.querySelectorAll('#rows tr').length===2);

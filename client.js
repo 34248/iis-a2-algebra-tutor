@@ -146,9 +146,9 @@ function resetPractice(message) {
 
 bind('start', async () => {
   // Clear before waiting, preserving anything typed during the request.
-  const code = $('tester').value.trim().toUpperCase();
-  if (code && !/^P[0-9]{2,5}$/.test(code)) throw Error('Use a tester code such as P01, or leave it empty.');
-  $('tester').value = code;
+  const code = $('tester').value.trim();
+  if (!/^[a-zA-Z0-9]{0,6}$/.test(code)) throw Error('Use up to 6 letters or digits, or leave the code blank.');
+  $('tester').value = code.toUpperCase();
   resetPractice('Starting a new practice session.');
   render(await api('/api/start', {
     problem_id: $('problem').value,
@@ -397,8 +397,8 @@ $('system-answer').addEventListener('input', () => { $('system-feedback').hidden
 function installBilingualView() {
   const labels = new Map(Object.entries({
     'Tester code (optional)': '测试者编号（可留空）',
-    'Use the same code for repeat tests. Leave blank for private practice.': '同一人重复测试请用同一编号；留空则不显示在实时结果页。',
-    'Use a tester code such as P01, or leave it empty.': '请输入 P01 这样的编号，或留空。',
+    'Use up to 6 letters or digits, e.g. 03. Reuse your code for repeat tests or leave it blank for private practice.': '编号可用 1 至 6 位英文字母或数字，例如 03。重复测试用同一编号，留空则只自己练习。',
+    'Use up to 6 letters or digits, or leave the code blank.': '请填写最多 6 位英文字母或数字，也可留空。',
     'Live results': '实时结果',
     'Starting again creates a separate practice record.': '重新开始会单独记录一次练习。',
     'New question difficulty': '新题难度',

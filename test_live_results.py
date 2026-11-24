@@ -18,13 +18,14 @@ class LiveResultTests(unittest.TestCase):
             with patch.object(telemetry, 'RUN_KIND', 'developer_demo'):
                 app.start(dict(payload, tester='P99'))
             session = app.start(dict(payload, tester='p01'))['session']
-            app.start(dict(payload, tester='P02'))
+            app.start(dict(payload, tester='03'))
+            app.start(dict(payload, tester='Team2'))
             app.start(dict(payload, tester='P01'))
             app.action({'session':session, 'action':'check', 'answer':'4'})
             for problem, answer in [('T02','7'),('T01','hello'),('T01','1'),('T01','3')]:
                 app.transfer({'session':session,'problem_id':problem,'answer':answer})
             rows = live_results.snapshot()
-            self.assertCountEqual([r['tester'] for r in rows], ['P01','P01','P02'])
+            self.assertCountEqual([r['tester'] for r in rows], ['P01','P01','03','TEAM2'])
             row = next(r for r in rows if r['independent_checks'])
             self.assertEqual((row['practice'],row['independent_first'],row['independent_latest']), (True,False,True))
             self.assertEqual(row['independent_checks'], 2)

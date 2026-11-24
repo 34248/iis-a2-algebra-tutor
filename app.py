@@ -147,8 +147,8 @@ def _start(payload):
         raise UserError('Choose a listed problem, condition and version.')
     question = text(payload.get('question'), 'Equation')
     tester = payload.get('tester', '')
-    if not isinstance(tester, str) or not re.fullmatch(r'(?:P[0-9]{2,5})?', tester.strip().upper()):
-        raise UserError('Use a tester code such as P01, or leave it empty.')
+    if not isinstance(tester, str) or not re.fullmatch(r'[A-Za-z0-9]{0,6}', tester.strip()):
+        raise UserError('Use up to 6 letters or digits, or leave the code blank.')
     state = {
         'tester': tester.strip().upper(), 'paired_problem': PROBLEMS[pid]['transfer_id'],
         'session': secrets.token_urlsafe(24), 'problem_id': pid,
