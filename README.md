@@ -1,6 +1,6 @@
 # Controlled help in algebra practice
 
-README prose word count: 556 (excluding headings and commands).
+README prose word count: 547 (excluding headings and commands).
 
 ## Run the tutor
 
@@ -12,9 +12,9 @@ python app.py --port 8769 --open
 
 Choose a question type, then select a problem and a help mode. A10 through A13 combine denominators, nested brackets, decimal coefficients and variables on both sides. Submit a line such as “Multiply both sides by 12: 3(3x - 2) - 2(x + 1) = 4(x - 1)” on A10. Use a space or a line break between complete equations and press Check my steps. Each step is compared with the original equation. On desktop, hints appear to the right. The paired independent exercise opens after the final answer is correct. Written explanations can also be recorded without a score. The language button switches between English and bilingual English–Chinese labels.
 
-To add a pair, choose Basic, Multi-step or Challenge and select Generate a new question. The tutor samples coefficients locally, verifies each step and both answers, and saves the pair under data/generated. Switch help mode to inspect the same problem again. The menus list only the built-in questions. Each newly generated pair opens for the current practice.
+Select a question type and click Generate a new question. For single-variable exercises, the tutor checks the steps and both answers, saves the pair under data/generated and lets you start practice in either help mode. The menus show the built-in items and the current generated question.
 
-For extra practice, choose Two variables under Question type. Select New system for another random pair of equations. The hints and coordinate checks use the current equations. This exercise sits outside the recorded comparison.
+For a system of equations, select Two variables and use the same button. Enter x and y in the workspace. The hints and answer check use both equations. This extra practice sits outside the recorded comparison.
 
 ## Try the comparison
 

@@ -4,7 +4,7 @@ from math import lcm
 import random
 
 
-LEVELS = ('Warm-up', 'Multi-step', 'Challenge')
+LEVELS = ('Warm-up', 'Signed numbers', 'Fractions', 'Multi-step', 'Challenge')
 
 
 def offset(value):
@@ -17,6 +17,20 @@ def exercise(level, rng):
         answer = rng.choice((-1, 1)) * rng.randint(1, 18)
         question = f'{a}x + {b} = {a*answer+b}'
         lines = [(f'Subtract {b} from both sides', f'{a}x = {a*answer}')]
+        divisor = a
+    elif level == 'Signed numbers':
+        answer = rng.randint(-18, -1)
+        question = f'-{a}x - {b} = {-a*answer-b}'
+        lines = [(f'Add {b} to both sides', f'-{a}x = {-a*answer}')]
+        divisor = -a
+    elif level == 'Fractions':
+        right = rng.randint(-8, 8)
+        if (right*c - b) % a == 0:
+            b += 1
+        answer = Fraction(right*c - b, a)
+        question = f'({a}x + {b})/{c} = {right}'
+        lines = [(f'Multiply both sides by {c}', f'{a}x + {b} = {right*c}'),
+                 (f'Subtract {b} from both sides', f'{a}x = {right*c-b}')]
         divisor = a
     elif level == 'Multi-step':
         d = rng.randint(1, a-1)

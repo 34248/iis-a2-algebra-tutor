@@ -31,7 +31,7 @@ function fail(error) {
 }
 
 function syncControls() {
-  for (const id of ['topic', 'problem', 'equation', 'condition', 'version', 'transfer', 'equation-feedback','difficulty','generate','tester']) {
+  for (const id of ['topic', 'problem', 'equation', 'condition', 'version', 'transfer', 'equation-feedback','generate','tester']) {
     $(id).disabled = busy || !config;
   }
   $('start').disabled = busy || !config;
@@ -310,6 +310,8 @@ function selectTopic(preferredId) {
   const systemSelected = topic === 'two-variable';
   document.querySelector('.workspace').classList.toggle('system-active', systemSelected);
   $('two-variable').hidden = !systemSelected;
+  $('system-hints').hidden = !systemSelected;
+  $('generation-status').textContent = '';
   if (systemSelected) return;
   const select = $('problem');
   const items = config.problems.filter(item => item.difficulty === topic);
@@ -326,7 +328,12 @@ $('topic').addEventListener('change', () => selectTopic(singleProblemId));
 
 bind('generate', async () => {
   $('generation-status').textContent = '';
-  const pair = await api('/api/generate', {difficulty: $('difficulty').value});
+  const topic = $('topic').value;
+  if (topic === 'two-variable') {
+    newSystem();
+    return;
+  }
+  const pair = await api('/api/generate', {difficulty: topic});
   config.problems.push(pair.practice);
   config.transfer.push(pair.partner);
   addOption($('transfer'), pair.partner, true);
@@ -380,9 +387,8 @@ function newSystem() {
   $('substitution-formula').textContent = 'y = (' + firstTotal + ' − ' + a + 'x) / ' + b;
   $('system-answer').reset();
   $('system-feedback').hidden = true;
-  for (const hint of $('two-variable').querySelectorAll('details')) hint.open = false;
+  for (const hint of $('system-hints').querySelectorAll('details')) hint.open = false;
 }
-$('new-system').addEventListener('click', newSystem);
 newSystem();
 
 // Keep typed decimals and fractions exact when substituting in both equations.
@@ -434,10 +440,10 @@ function installBilingualView() {
     'Use up to 6 letters or digits, or leave the code blank.': '请填写最多 6 位英文字母或数字，也可留空。',
     'Live results': '实时结果',
     'Starting again creates a separate practice record.': '重新开始会单独记录一次练习。',
-    'New question difficulty': '新题难度',
+    'Hints': '解题提示',
     'Basic': '基础', 'Multi-step': '多步', 'Challenge': '挑战',
     'Generated': '生成题', 'Question type': '题型', 'Signed numbers': '正负数',
-    'Fractions': '分数', 'Two variables': '二元', 'New system': '换一题',
+    'Fractions': '分数', 'Two variables': '二元',
     'Step hints': '逐步提示', 'Full example': '完整例题',
     'Generate a new question': '生成新题',
     'Two-variable challenge': '二元方程组挑战',

@@ -75,7 +75,7 @@ const {pathToFileURL} = require('node:url');
       assert.equal(await page.locator('#substitution-formula').textContent(),'y = ('+r+' − '+a+'x) / '+b);
       assert.equal(await page.locator('#elimination-formula').textContent(),d+' × ① + '+b+' × ②  ⇒  '+(d*a+b*c)+'x = '+(d*r+b*s));
       previousX=x;
-      await page.click('#new-system');
+      await page.click('#generate');
       assert.equal(await page.inputValue('#system-x'),'');
     }
     await page.selectOption('#topic','Challenge');
