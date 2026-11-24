@@ -1,71 +1,37 @@
-# Controlled algebra practice
+# Controlled help in algebra practice
 
-README prose word count: 667. Code and setup commands excluded.
+README prose word count: 375 (excluding headings and commands).
 
-An IIS A2 prototype for the A1 question about attempt-first gradual help versus immediate worked solutions. Nine authored practice items and nine paired new items cover signs, fractions, brackets and multi-step equations. Both help formats use identical checked steps.
+## Run the tutor
 
-## Status and review version
-
-Local review release: a2-review-v5. The application behaviour is unchanged from a2-review-v4; this revision strengthens the report, inspection instructions and evidence mapping. Public repository and README links are still outstanding. No Canvas submission has been made.
-
-Implemented: browser interaction, exact linear-equation checks, gradual/immediate help, answer checking, paired unaided practice and local trace export. Simulated: model.py returns checked steps through an offline response interface; no live language model is connected. Planned: recruitment, prior-knowledge measurement, condition assignment, controlled post-testing and conceptual scoring. [Research boundaries](docs/RESEARCH_PROTOCOL.md) explain these gaps.
-
-## Run or inspect
+Open run.cmd on Windows, or run the following from this directory with Python 3.12. Open the address printed by the server. No external services or Python packages are needed for practice.
 
 ```text
-python app.py --port 8764 --open
+python app.py --port 8766 --open
 ```
 
-Use Python 3.12 or later. The application has no third-party dependencies or API keys. run.cmd uses the prepared Windows runtime where available, otherwise Python on PATH. Follow the printed URL if the requested port is occupied. The server binds to 127.0.0.1; stop it with Ctrl+C.
+Choose a problem and a help mode, then start. A10 through A13 combine denominators, nested brackets, decimal coefficients and variables on both sides. Submit a line such as “Multiply both sides by 12: 3(3x - 2) - 2(x + 1) = 4(x - 1)” on A10. The checker compares the equations. Written explanations can also be recorded without a score. The language button switches between English and bilingual English–Chinese labels.
 
-Start with the [inspection walkthrough](docs/INSPECTION.md). It gives inputs, expected responses, current screenshots and the source files responsible. The [report](docs/IIS_A2_Project_Report.pdf) contains the rationale, architecture and three illustrated interactions. Editable figures are in [docs/figures](docs/figures).
+## Try the comparison
 
-Record an explanation or check an equation before requesting gradual help. Immediate mode shows all the same steps together. A correct final answer offers the paired new question. New questions allow retries and immediate feedback, so they are practice rather than a controlled post-test. Export CSV before restarting. Demo controls contain the intentionally defective baseline, unavailable-response simulation and the option to disable equation feedback in either condition.
+In gradual mode, record an attempt and request one step. Switch to the full worked example and start again to see the same sequence together. After solving each practice item, try its paired exercise independently. Each mode can be run with the extra equation checker disabled. Download the current CSV before starting another session. The [walkthrough](docs/INSPECTION.md) describes the controls.
 
-## Technology and boundaries
+## Implementation and evidence
 
-| Component | Role |
-| --- | --- |
-| HTML, CSS and client.js | Browser controls, persistent steps and feedback |
-| Python standard library and app.py | Local HTTP service and session controller |
-| algebra.py and Fraction | Restricted linear expressions and exact solution equivalence |
-| problems.json and transfer.json | Checked, authored tasks and solutions |
-| model.py | Simulated response boundary with validated step prefixes |
-| telemetry.py | Metadata-only JSONL and active-session CSV |
+The Python server checks supported linear equations and numeric answers using fractions. The response module simulates delivery of authored steps. The browser requests a step, and the controller validates how much to release. No API key is required. Practice events can be stored locally. [Trace fields](docs/TRACE_FORMAT.md) describe which events are saved. The examples in evidence are developer demonstrations. There has been no participant trial.
 
-The checker does not execute submitted expressions or grade explanations. Fixed content keeps the help comparison inspectable; it cannot offer open-ended dialogue. Optional equation feedback is enforced by the server and recorded in the trace.
+The project extends the Lab4 tutor in the [provenance record](docs/PROVENANCE.md). Earlier revisions added trace export, input checking and the paired independent exercises. The algebra-only branch starts from the version before image import. The four new pairs keep the two help modes comparable while giving more experienced learners longer problems. An input fix lets students submit a description followed by a colon and an equation. Codex helped implement these changes, draft and edit the report and test the result. New items were checked against their worked lines and substitutions. The [development record](docs/DEVELOPMENT.md) gives the sequence of changes.
 
-## Development and assistance
-
-The [development record](docs/DEVELOPMENT.md) explains changes, their reasons and checks. [Provenance](docs/PROVENANCE.md) identifies the reused Lab4 baseline and source fingerprints. The original lab remains separate. The [decision record](docs/DECISIONS.md) distinguishes the student's stated requests from assistant implementation and review still to be done.
-
-OpenAI Codex adapted the lab, implemented features, ran checks, captured evidence and assisted drafting. Earlier prose review used the humanizer skill. Corrections included an answer leaking through placeholder feedback, invalid input being scored as wrong, declined responses releasing steps and stale results after input changes. These assistant-run checks do not establish the student's independent authorship or participant learning. The student must inspect the result and be able to explain the choices.
-
-## Checks and records
-
-The unchanged application has evidence for 40 code tests and 32 browser checks. [The evidence index](docs/INSPECTION.md#verification-evidence) links their results and distinguishes historical failures. These are software checks, not learning outcomes.
+## Verify
 
 ```text
 python -m unittest discover -v
 ```
 
-Browser checks additionally require Node.js and Playwright. Set PYTHON_EXECUTABLE and optionally BROWSER_EXECUTABLE for an installed Chromium-family browser.
+With the local app running on port 8766, run the challenge walkthrough with Node and Playwright. Set BROWSER_EXECUTABLE if using an installed Chromium browser. TUTOR_URL can point to a different local port.
 
 ```text
-npm install --no-save playwright
-npx playwright install chromium
-node tools/browser_checks.cjs
-node tools/browser_regressions.cjs
-node tools/browser_quality.cjs
-node tools/browser_learning.cjs
+node tools/browser_challenge.cjs
 ```
 
-Saved traces under data/ are excluded from Git and the review ZIP. They contain event metadata, not names, free-text working or access tokens. A trace identifier denotes a session, not a participant. Restart resets in-memory practice state; saved files remain until deleted. A file-write failure is disclosed while in-memory CSV remains downloadable. [Trace fields](docs/TRACE_FORMAT.md) explain invalid inputs and timing limits. developer_demo and developer_check records are automated examples.
-
-## Additional material
-
-The local review ZIP is a convenience copy, not an extra Canvas requirement. It includes evidence/development.bundle to restore the actual local Git history; the ignored bundle is not published in Git. Research-paper reading copies remain outside the repository and ZIP. The intended Canvas deliverable is one report linking the public repository, README and submitted commit or release. No video is required for A2.
-
-```text
-git clone evidence/development.bundle iis-a2
-```
+The [report](docs/IIS_A2_Project_Report.pdf) includes the architecture and three illustrated interactions. This copy is for local review. Public GitHub links are still required for submission.

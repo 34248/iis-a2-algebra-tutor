@@ -93,6 +93,11 @@ def solution(source):
 
 def check_step(original, proposed):
     expected = solution(original)
+    # A worked step can include a description before the equation.
+    if isinstance(proposed, str) and proposed.count('=') == 1:
+        parts = re.split(r'[:：]', proposed, maxsplit=1)
+        if len(parts) == 2 and '=' not in parts[0] and re.search(r'[^\W\d_]', parts[0]):
+            proposed = parts[1].strip().removesuffix('。').removesuffix('.')
     try:
         left, right, result = equation(proposed)
     except EquationError as error:

@@ -4,7 +4,7 @@ let config = null;
 let busy = false;
 let current = null;
 let checkedWorking = null;
-const topicNote = difficulty => ({'Warm-up': 'Two-step equations with whole numbers.', 'Signed numbers': 'Practise signs and negative values.', 'Fractions': 'Work with fractional values and coefficients.', 'Multi-step': 'Work with brackets, fractions and x on both sides.'})[difficulty];
+const topicNote = difficulty => ({'Warm-up': 'Two-step equations with whole numbers.', 'Signed numbers': 'Practise signs and negative values.', 'Fractions': 'Work with fractional values and coefficients.', 'Challenge': 'Practise clearing denominators, nested brackets and decimal coefficients.', 'Multi-step': 'Work with brackets, fractions and x on both sides.'})[difficulty];
 
 function node(tag, text) {
   const element = document.createElement(tag);
@@ -271,3 +271,169 @@ syncControls();
     fail(error);
   }
 })();
+
+/* Shared display preferences for the three practice pages. */
+function installBilingualView() {
+  const labels = new Map(Object.entries({
+    'Algebra practice': '代数练习',
+    'Practise clearing denominators, nested brackets and decimal coefficients.': '综合练习去分母、嵌套括号和小数系数。',
+    'Thirteen practice equations each have a paired independent question. The challenge set combines fractions, brackets and variables on both sides. The checker and worked steps run locally.': '13 道练习题各配一道独立题。挑战题结合分数、括号及两边含未知数的方程。所有检查和提示均在本机运行。',
+    '← Algebra practice': '← 返回代数练习',
+    'Offline tutor': '离线辅导说明',
+    'Linear equations': '一元一次方程',
+    'Choose a question and how much help you want.': '选一道题，再选你希望怎样获得帮助。',
+    '13 practice items': '13 道练习题',
+    '13 new questions without hints': '13 道无提示新题',
+    'Practice settings': '练习设置',
+    'Choose a problem': '选择练习题',
+    'How would you like help?': '你希望怎样获得帮助？',
+    'Try first · step hints': '先尝试，逐步看提示',
+    'Full worked example': '查看完整例题',
+    'Write your first attempt to unlock a hint.': '先写一步并提交，即可解锁提示。',
+    'The same checked steps appear together. You can still check your own working.': '一次展示完整步骤，你也可以检查自己的解法。',
+    'Start practice': '开始练习',
+    'Start fresh': '重新开始',
+    'Starting again creates a fresh session. Download your record first if you want to keep it.': '重新开始会创建新的练习记录。想保留本次记录，请先下载。',
+    'Demo controls': '演示设置',
+    'Equation sent to the tutor': '交给助手的方程',
+    'Input handling': '输入处理方式',
+    'Checked input': '检查输入',
+    'Before correction: error demonstration': '修正前的错误演示',
+    'Allow equation feedback': '允许检查方程变形',
+    'For a presentation-only comparison, switch this off in both conditions. Its setting is included in the record.': '如果只比较步骤展示方式，请在两种模式下都关闭此项。系统会记录这一设置。',
+    'Simulate a missing response': '模拟助手无响应',
+    'Inspect incomplete input and recovery here. The error demonstration deliberately ignores an incomplete equation.': '在这里测试方程输入不完整时的表现。错误演示模式会故意忽略方程缺失的部分。',
+    'Your working': '你的解题过程',
+    'Ready to start': '准备开始',
+    'Solve for x': '求 x 的值',
+    'Choose how you want help, then start.': '选好提示方式后，点击开始练习。',
+    'Your working stays here while you practise.': '练习过程中，你写的步骤会保留在这里。',
+    'Your next equation or explanation': '你的下一步方程或解题思路',
+    'Write a complete equation to check it, or describe your approach.': '输入完整方程以检查这一步，或写下思路。',
+    'Check this equation': '检查这一步',
+    'Record explanation': '记录思路',
+    'Check whether your equation has the same solution. You can also save a written explanation without grading it.': '检查变形后的方程与原方程是否同解。文字思路可以保存，不计分。',
+    'Worked steps': '解题步骤',
+    'You can refer back to each step you open.': '可以回看已经展开的步骤。',
+    'Reveal next step': '查看下一步',
+    'Your final answer': '最终答案',
+    'Enter a number or fraction': '输入数字或分数',
+    'Check answer': '检查答案',
+    'Equation solved.': '这道方程答对了。',
+    'Try a new question without hints': '独立做一道新题',
+    'This session': '本次练习',
+    'Start a practice session to create a record.': '开始练习后会生成记录。',
+    'Download CSV': '下载练习记录',
+    'View practice events': '查看操作记录',
+    'Try one on your own': '独立练习',
+    'Choose a new question': '选择一道新题',
+    'Your answer without help': '你独立算出的答案',
+    'No hints or worked steps will be shown.': '独立练习不显示提示和解题步骤。',
+    'You can retry. These practice answers are not a controlled learning assessment.': '可以重试。这里的答案只用于练习。',
+    'About this prototype and your records': '关于本系统与练习记录',
+    'Operation counts and outcomes can be saved on this computer. Your free-text working and session access tokens are excluded from the saved trace. The software checks and sample CSV files are developer demonstrations. A participant study remains future work.': '可在本机保存操作次数和结果。记录会排除自由输入的文字和会话凭证。示例数据来自开发测试，真人研究尚待开展。',
+    'Two-step equations with whole numbers.': '用两步求解整数方程。',
+    'Practise signs and negative values.': '练习符号和负数。',
+    'Work with fractional values and coefficients.': '练习分数解和分数系数。',
+    'Work with brackets, fractions and x on both sides.': '练习括号、分数及两边均有 x 的方程。',
+    'Check input': '检查输入', 'Solved': '已解出', 'In progress': '进行中',
+    'Nothing shown yet': '尚未显示步骤',
+    'Start a practice session.': '请开始练习。',
+    'Starting a new practice session.': '正在开始新练习。',
+    'Setup changed. Start a new practice session.': '设置已更改，请重新开始。',
+    'Problem changed. Start a new practice session.': '题目已更改，请开始新练习。',
+    'Answer changed. Check it when ready.': '答案已修改，可以重新检查。',
+    'Working changed. Check your equation or record your explanation.': '步骤已修改，可以检查方程或记录思路。',
+    'Try a step first. Your attempt unlocks the first hint; it is recorded, not automatically graded.': '先写一步并提交，就能解锁第一条提示。系统会记录这次尝试。',
+    'Attempt recorded. Select Next hint when you want one checked step.': '思路已记录。需要帮助时，点「查看下一步」。',
+    'Checked steps are shown below. This is a fixed-content tutor simulation.': '下方显示已核对的步骤，来自这道题预先编写的解法。',
+    'Equivalent equation: this line keeps the same solution. Continue with your own next step.': '变形正确，方程仍然同解。接着试试下一步。',
+    'Equivalent equation: x is isolated. Check this value in the final answer box.': '变形正确，已经解出 x。请在最终答案框中检查这个值。',
+    'This line changes the solution of the original equation. Check the signs and apply the same operation to both sides.': '这一步改变了原方程的解。检查正负号，确认两边做了相同的运算。',
+    'Correct final answer for this checked problem.': '最终答案正确。',
+    'That final answer does not match this problem. Check your own working or request the next available hint.': '答案有误。可以检查步骤，或查看下一条提示。',
+    'Not correct; try again without help.': '答案有误，再独立试一次。',
+    'Correct.': '答对了。',
+    'Enter a number or fraction, optionally starting with x =.': '请输入数字或分数，也可以用 x = 开头。',
+  }));
+  const patterns = [
+    [/^([AT]\d+) · (Warm-up|Multi-step|Signed numbers|Fractions|Challenge)$/, (_, id, topic) => ({'Challenge':'挑战题','Warm-up':'基础题','Multi-step':'多步运算','Signed numbers':'正负数','Fractions':'分数'})[topic]],
+    [/^(\d+) of (\d+) shown$/, (_, n, total) => '已显示 ' + n + ' / ' + total + ' 步'],
+    [/^(Try first|Worked solution) · (\d+) attempts? recorded$/, (_, mode, n) => (mode === 'Try first' ? '先尝试' : '完整例题') + '，已记录 ' + n + ' 次尝试'],
+    [/^(\d+) equation checks? · (\d+) valid answer checks?$/, (_, a, b) => '方程检查 ' + a + ' 次，答案检查 ' + b + ' 次'],
+    [/^(\d+) valid answer checks? · (\d+) of (\d+) worked steps viewed\. Try the paired question next\.$/, (_, a, b, c) => '检查答案 ' + a + ' 次，看过 ' + b + ' / ' + c + ' 步。接下来试试配对的新题。'],
+    [/^(Subtract|Add) (.+?) (?:from|to) both sides: (.+)\.$/, (_, op, v, eq) => '两边都' + (op === 'Add' ? '加上 ' : '减去 ') + v + '，得到 ' + eq + '。'],
+    [/^(Divide|Multiply) both sides by (.+?): (.+)\.$/, (_, op, v, eq) => '两边都' + (op === 'Divide' ? '除以 ' : '乘以 ') + v + '，得到 ' + eq + '。'],
+    [/^(Check by substitution|Expand the brackets|Collect the x terms|Collect like terms|Combine the constant terms): (.+)\.$/, (_, op, v) => ({'Check by substitution':'代入检验','Expand the brackets':'展开括号','Collect the x terms':'合并含 x 的项','Collect like terms':'合并同类项','Combine the constant terms':'合并常数项'})[op] + '：' + v + '。'],
+  ];
+  function translation(text) {
+    if (labels.has(text)) return labels.get(text);
+    for (const [pattern, format] of patterns) {
+      const match = text.match(pattern);
+      if (match) return format(...match);
+    }
+    return '';
+  }
+
+  const main = document.querySelector('main');
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'language-switch';
+  button.setAttribute('aria-label', 'English + 中文 · 中英对照');
+  const toolbar = document.querySelector('header nav') || main;
+  if (toolbar === main) main.prepend(button);
+  else toolbar.append(button);
+  const preference = 'iis-tutor-bilingual';
+  const query = new URL(location.href).searchParams.get('lang');
+  let enabled = query === 'both' || (query === null && localStorage.getItem(preference) === 'both');
+  const originals = new WeakMap();
+  function updateText(node) {
+    if (!node.parentElement || node.parentElement.closest('script,style,textarea,pre,#current-equation,#transfer-equation,.language-switch')) return;
+    const original = originals.get(node) ?? node.data;
+    const english = original.trim();
+    const chinese = translation(english);
+    if (!chinese) return;
+    originals.set(node, original);
+    const next = enabled ? original.replace(english, () => english + ' / ' + chinese) : original;
+    if (node.data !== next) node.data = next;
+  }
+  function visit(root) {
+    if (root.nodeType === Node.TEXT_NODE) return updateText(root);
+    const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (walk.nextNode()) updateText(walk.currentNode);
+  }
+  const observer = new MutationObserver(records => {
+    for (const record of records) {
+      for (const added of record.addedNodes) visit(added);
+    }
+  });
+  function refresh() {
+    main.translate = !enabled;
+    visit(main);
+    for (const field of main.querySelectorAll('[placeholder]')) {
+      const original = field.dataset.placeholderEn ?? field.placeholder;
+      field.dataset.placeholderEn = original;
+      const chinese = translation(original);
+      field.placeholder = enabled && chinese ? original + ' / ' + chinese : original;
+    }
+    button.textContent = enabled ? 'English only' : '中英对照';
+    button.setAttribute('aria-pressed', String(enabled));
+    main.classList.toggle('bilingual', enabled);
+  }
+  function savePreference() {
+    localStorage.setItem(preference, enabled ? 'both' : 'en');
+  }
+  if (query !== null) savePreference();
+  button.onclick = () => {
+    enabled = !enabled;
+    savePreference();
+    const url = new URL(location.href);
+    url.searchParams.set('lang', enabled ? 'both' : 'en');
+    history.replaceState(null, '', url);
+    refresh();
+  };
+  refresh();
+  observer.observe(main, {childList:true, subtree:true});
+}
+installBilingualView();
+

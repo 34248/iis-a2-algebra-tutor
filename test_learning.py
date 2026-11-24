@@ -25,6 +25,13 @@ class EquationChecks(unittest.TestCase):
         self.assertFalse(result['equivalent'])
         self.assertNotIn('4', result['reply'])
 
+    def test_equation_after_explanation(self):
+        original = '2x + 3 = 11'
+        for line in ['Subtract 3 from both sides: 2x = 8', '两边减去 3：2x = 8。']:
+            self.assertTrue(algebra.check_step(original, line)['equivalent'])
+        self.assertFalse(algebra.check_step(original, 'Subtract 3: 2x = 14')['equivalent'])
+        self.assertFalse(algebra.check_step(original, 'x = 9: 2x = 8')['valid'])
+
     def test_exact_decimal_fraction_and_parentheses(self):
         self.assertEqual(algebra.solution('0.1x + 0.2 = 0.5'), Fraction(3))
         self.assertEqual(algebra.solution('2(x + 1) = 10'), Fraction(4))
@@ -43,8 +50,8 @@ class EquationChecks(unittest.TestCase):
                 self.assertFalse(algebra.check_step('2x + 3 = 11', line)['valid'])
 
     def test_all_authored_items_and_steps_are_verified(self):
-        self.assertEqual(len(app.PROBLEMS), 9)
-        self.assertEqual(len(app.TRANSFER), 9)
+        self.assertEqual(len(app.PROBLEMS), 13)
+        self.assertEqual(len(app.TRANSFER), 13)
         algebra.validate_catalog(app.PROBLEMS, app.TRANSFER)
 
     def test_corrupt_catalog_is_rejected(self):

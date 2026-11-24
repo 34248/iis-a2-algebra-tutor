@@ -18,3 +18,11 @@
   .intro { padding-block: 16px; }
   .working-buttons button { min-height: 44px; }
 }
+.language-switch { margin: 4px; padding: 6px 12px; font: inherit; font-size: 14px; cursor: pointer; }
+main > .language-switch { float: right; margin: 0 0 8px 10px; }
+.bilingual nav, .bilingual .buttons { display: flex; flex-wrap: wrap; gap: 5px; }
+.bilingual .card-top, .bilingual .help-top, .bilingual .record-area, .bilingual .top { flex-wrap: wrap; }
+.bilingual h1 { overflow-wrap: anywhere; }
+
+
+.app {max-width:1320px} .top nav {display:flex;flex-wrap:wrap;align-items:center;gap:8px} .setup-card {border-top:3px solid var(--accent)} .intro h1 {font-family:Georgia,serif} #current-equation {font-size:clamp(23px,3vw,34px)}

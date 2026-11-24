@@ -52,5 +52,29 @@
     "question": "(x - 2)/4 + x/3 = 3",
     "answer": 6,
     "difficulty": "Multi-step"
+  },
+  {
+    "id": "T10",
+    "question": "(5x + 1)/6 - (x - 2)/4 = (x + 4)/3",
+    "answer": "8/3",
+    "difficulty": "Challenge"
+  },
+  {
+    "id": "T11",
+    "question": "3(2 - (x + 1)/3) = (x - 2)/2 + 4",
+    "answer": "4/3",
+    "difficulty": "Challenge"
+  },
+  {
+    "id": "T12",
+    "question": "0.45(2x - 2) - 0.15(x + 4) = 0.25(x - 2) + 2",
+    "answer": 6,
+    "difficulty": "Challenge"
+  },
+  {
+    "id": "T13",
+    "question": "7/6 - (3x - (2 - x)/2)/3 = (x + 1)/4",
+    "answer": "15/17",
+    "difficulty": "Challenge"
   }
 ]

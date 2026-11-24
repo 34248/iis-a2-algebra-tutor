@@ -1,5 +1,7 @@
 # Development record
 
+This release returns to the algebra prototype at 85a4964 and adds four paired challenges. All 41 unit tests passed. The browser walkthrough exercised A10–A13 and T10–T13, both help modes, incorrect and correct answers, the language switch and a 390-pixel layout. The earlier entries below document earlier releases.
+
 ## Imported tutor
 Retained the two checked items, attempt-first release, immediate comparison, input validation and separate unaided route from Lab4. Removed the unrelated course/vision/tool exercises from the A2 interface so the implementation matches the A1 research question. Their original lab files remain separate.
 

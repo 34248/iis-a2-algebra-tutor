@@ -1,6 +1,6 @@
 # Inspection walkthrough
 
-This route checks the developed interaction. No participant study is implied. The application is unchanged from a2-review-v4; a2-review-v5 updates the explanatory material. Start the app using the README. Use the revised version with equation feedback enabled unless a step says otherwise.
+For the current release select A10, enter the first worked line shown in the README, request a hint, and compare it with the complete solution in immediate mode. Run tools/browser_challenge.cjs to check all four new pairs. Earlier walkthroughs and screenshots below relate to the base release.
 
 ## Follow three interactions
 
