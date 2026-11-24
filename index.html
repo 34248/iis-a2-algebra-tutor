@@ -11,7 +11,7 @@
 <main class="app">
   <header class="top">
     <div class="brand"><span class="brand-mark" aria-hidden="true">x</span><span>Algebra practice</span></div>
-    <nav><a class="offline" href="#about">Offline tutor <span aria-hidden="true">↗</span></a></nav>
+    <nav><a class="offline" href="#two-variable">Two-variable challenge</a><a class="offline" href="#about">Offline tutor <span aria-hidden="true">↗</span></a></nav>
   </header>
   <div class="intro"><div><h1>Linear equations</h1><p class="lead">Choose a question and how much help you want.</p></div><p class="catalog-size">13 practice items<br><span>13 new questions without hints</span></p></div>
   <div class="workspace">
@@ -76,6 +76,23 @@
       </section>
     </div>
   </div>
+  <section class="card system-challenge" id="two-variable" aria-labelledby="system-title" hidden>
+    <a class="offline" href="#practice">Back to practice</a>
+    <h1 id="system-title" tabindex="-1">Two-variable challenge</h1>
+    <p>Find the pair that satisfies both equations.</p>
+    <div class="equation system-equations"><div>3x + 2y = 7</div><div>2x − 3y = 9</div></div>
+    <details><summary>Elimination hint</summary><p>Multiply the first equation by 3 and the second by 2. Add the results to cancel y.</p></details>
+    <details><summary>Substitution hint</summary><p>From the first equation, y = (7 − 3x)/2. Substitute this expression for y in the second equation.</p></details>
+    <form id="system-answer">
+      <div class="system-coordinates">
+        <label>x<input id="system-x" maxlength="50" autocomplete="off"></label>
+        <label>y<input id="system-y" maxlength="50" autocomplete="off"></label>
+      </div>
+      <button class="primary">Check both equations</button>
+      <p class="feedback" id="system-feedback" role="status" hidden></p>
+    </form>
+    <p class="sub">Extra practice outside the two help modes. Answers stay on this page.</p>
+  </section>
   <p id="error" class="error-banner" role="alert" hidden></p>
   <footer><details id="about"><summary>About this prototype and your records</summary><p>Thirteen practice equations each have a paired independent question. The challenge set combines fractions, brackets and variables on both sides. The checker and worked steps run locally.</p><p>Operation counts and outcomes can be saved on this computer. Your free-text working and session access tokens are excluded from the saved trace. The software checks and sample CSV files are developer demonstrations. A participant study remains future work.</p></details></footer>
 </main>

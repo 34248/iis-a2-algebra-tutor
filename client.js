@@ -335,6 +335,58 @@ $('problem').addEventListener('change', () => { $('generation-status').textConte
 })();
 
 /* Shared display preferences for the three practice pages. */
+function showChallenge() {
+  const active = location.hash === '#two-variable';
+  $('two-variable').hidden = !active;
+  document.querySelector('.intro').hidden = active;
+  document.querySelector('.workspace').hidden = active;
+  if (active) $('system-title').focus({preventScroll:true});
+}
+window.addEventListener('hashchange', showChallenge);
+showChallenge();
+
+// Keep typed decimals and fractions exact when substituting in both equations.
+function coordinate(value) {
+  const text = value.trim().replaceAll('−', '-');
+  const fraction = /^([+-]?\d+)\s*\/\s*([+-]?\d+)$/.exec(text);
+  if (fraction) {
+    const denominator = BigInt(fraction[2]);
+    return denominator === 0n ? null : [BigInt(fraction[1]), denominator];
+  }
+  if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(text)) return null;
+  const places = (text.split('.')[1] || '').length;
+  return [BigInt(text.replace('.', '')), 10n ** BigInt(places)];
+}
+
+$('system-answer').addEventListener('submit', event => {
+  event.preventDefault();
+  const x = coordinate($('system-x').value);
+  const y = coordinate($('system-y').value);
+  const feedback = $('system-feedback');
+  feedback.hidden = false;
+  feedback.dataset.status = 'warn';
+  if (!x || !y) {
+    feedback.textContent = 'Enter a number or a fraction with a nonzero denominator for each variable.';
+    return;
+  }
+  const scale = x[1] * y[1];
+  const scaledX = x[0] * y[1];
+  const scaledY = y[0] * x[1];
+  const first = 3n * scaledX + 2n * scaledY === 7n * scale;
+  const second = 2n * scaledX - 3n * scaledY === 9n * scale;
+  if (first && second) {
+    feedback.dataset.status = 'good';
+    feedback.textContent = 'Correct. Your pair satisfies both equations.';
+  } else if (first) {
+    feedback.textContent = 'The first equation balances. Check the second.';
+  } else if (second) {
+    feedback.textContent = 'The second equation balances. Check the first.';
+  } else {
+    feedback.textContent = 'Check both equations. Substitute your x and y in each one.';
+  }
+});
+$('system-answer').addEventListener('input', () => { $('system-feedback').hidden = true; });
+
 function installBilingualView() {
   const labels = new Map(Object.entries({
     'Tester code (optional)': '测试者编号（可留空）',
@@ -346,6 +398,20 @@ function installBilingualView() {
     'Basic': '基础', 'Multi-step': '多步', 'Challenge': '挑战',
     'Current generated question': '当前生成题',
     'Generate a new question': '生成新题',
+    'Two-variable challenge': '二元方程组挑战',
+    'Back to practice': '返回一元练习',
+    'Find the pair that satisfies both equations.': '求同时满足两个方程的 x 和 y。',
+    'Elimination hint': '消元法提示',
+    'Substitution hint': '代入法提示',
+    'Multiply the first equation by 3 and the second by 2. Add the results to cancel y.': '第一个方程乘以 3，第二个乘以 2，再把两个方程相加消去 y。',
+    'From the first equation, y = (7 − 3x)/2. Substitute this expression for y in the second equation.': '由第一个方程得到 y = (7 − 3x)/2，再把第二个方程中的 y 换成这个式子。',
+    'Check both equations': '检验两个方程',
+    'Extra practice outside the two help modes. Answers stay on this page.': '这是两种提示模式之外的额外练习，答案只在本页核对。',
+    'Enter a number or a fraction with a nonzero denominator for each variable.': '请为 x 和 y 各填一个数；若填分数，分母须非零。',
+    'Correct. Your pair satisfies both equations.': '答对了，这组数同时满足两个方程。',
+    'The first equation balances. Check the second.': '第一个方程成立，请检查第二个。',
+    'The second equation balances. Check the first.': '第二个方程成立，请检查第一个。',
+    'Check both equations. Substitute your x and y in each one.': '两个方程都不成立，请分别代入 x 和 y 检查。',
     'Saved on this computer. Select Start practice to begin.': '题目已保存在本机，点击「开始练习」即可作答。',
     'Algebra practice': '代数练习',
     'Practise clearing denominators, nested brackets and decimal coefficients.': '综合练习去分母、嵌套括号和小数系数。',
