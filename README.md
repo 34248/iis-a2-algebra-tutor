@@ -1,6 +1,6 @@
 # Controlled help in algebra practice
 
-README prose word count: 544 (excluding headings and commands).
+README prose word count: 548 (excluding headings and commands).
 
 ## Run the tutor
 
@@ -14,7 +14,7 @@ Choose a problem and a help mode, then start. A10 through A13 combine denominato
 
 To add a pair, choose Basic, Multi-step or Challenge and select Generate a new question. The tutor samples coefficients locally, verifies each step and both answers, and saves the pair under data/generated. Switch help mode to inspect the same problem again. The menus list only the built-in questions. Each newly generated pair opens for the current practice.
 
-For extra practice, open Two-variable challenge. Try elimination or substitution and check the two coordinates against both equations. This exercise sits outside the recorded comparison.
+For extra practice, select Two-variable challenge from Choose a problem. Try elimination or substitution and check the two coordinates against both equations. This exercise sits outside the recorded comparison.
 
 ## Try the comparison
 

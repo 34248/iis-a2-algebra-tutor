@@ -245,8 +245,16 @@ for (const id of ['condition', 'version', 'equation', 'equation-feedback', 'test
   $(id).addEventListener('change', () => resetPractice(
     'Setup changed. Start a new practice session.'));
 }
+let singleProblemId;
 $('problem').addEventListener('change', () => {
-  const item = config.problems.find(item => item.id === $('problem').value);
+  const selected = $('problem').value;
+  const systemSelected = selected === 'two-variable';
+  document.querySelector('.workspace').classList.toggle('system-active', systemSelected);
+  $('two-variable').hidden = !systemSelected;
+  $('problem').setAttribute('aria-describedby', systemSelected ? 'system-title' : 'problem-kind');
+  if (systemSelected || selected === singleProblemId) return;
+  singleProblemId = selected;
+  const item = config.problems.find(item => item.id === selected);
   $('equation').value = item.question;
   $('current-equation').textContent = item.question;
   $('problem-kind').textContent = topicNote(item.difficulty);
@@ -313,6 +321,13 @@ bind('generate', async () => {
   $('generation-status').textContent = 'Saved on this computer. Select Start practice to begin.';
 });
 $('problem').addEventListener('change', () => { $('generation-status').textContent = ''; });
+function selectLinkedChallenge() {
+  if (!config || location.hash !== '#two-variable') return;
+  $('problem').value = 'two-variable';
+  $('problem').dispatchEvent(new Event('change'));
+  history.replaceState(null, '', location.pathname + location.search);
+}
+window.addEventListener('hashchange', selectLinkedChallenge);
 (async () => {
   try {
     const response = await fetch('/api/config');
@@ -325,6 +340,9 @@ $('problem').addEventListener('change', () => { $('generation-status').textConte
     document.querySelector('.catalog-size').replaceChildren(
       node('span', $('problem').length + ' practice items'), document.createElement('br'),
       node('span', $('transfer').length + ' new questions without hints'));
+    $('problem').add(new Option('Two-variable challenge', 'two-variable'));
+    singleProblemId = $('problem').value;
+    selectLinkedChallenge();
     $('problem-kind').textContent = topicNote(loaded.problems[0].difficulty);
     $('current-equation').textContent = loaded.problems[0].question;
     resetUnassisted();
@@ -333,17 +351,6 @@ $('problem').addEventListener('change', () => { $('generation-status').textConte
     fail(error);
   }
 })();
-
-/* Shared display preferences for the three practice pages. */
-function showChallenge() {
-  const active = location.hash === '#two-variable';
-  $('two-variable').hidden = !active;
-  document.querySelector('.intro').hidden = active;
-  document.querySelector('.workspace').hidden = active;
-  if (active) $('system-title').focus({preventScroll:true});
-}
-window.addEventListener('hashchange', showChallenge);
-showChallenge();
 
 // Keep typed decimals and fractions exact when substituting in both equations.
 function coordinate(value) {
@@ -399,7 +406,6 @@ function installBilingualView() {
     'Current generated question': '当前生成题',
     'Generate a new question': '生成新题',
     'Two-variable challenge': '二元方程组挑战',
-    'Back to practice': '返回一元练习',
     'Find the pair that satisfies both equations.': '求同时满足两个方程的 x 和 y。',
     'Elimination hint': '消元法提示',
     'Substitution hint': '代入法提示',

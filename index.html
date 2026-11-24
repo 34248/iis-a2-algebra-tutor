@@ -11,29 +11,33 @@
 <main class="app">
   <header class="top">
     <div class="brand"><span class="brand-mark" aria-hidden="true">x</span><span>Algebra practice</span></div>
-    <nav><a class="offline" href="#two-variable">Two-variable challenge</a><a class="offline" href="#about">Offline tutor <span aria-hidden="true">↗</span></a></nav>
+    <nav><a class="offline" href="#about">Offline tutor <span aria-hidden="true">↗</span></a></nav>
   </header>
   <div class="intro"><div><h1>Linear equations</h1><p class="lead">Choose a question and how much help you want.</p></div><p class="catalog-size">13 practice items<br><span>13 new questions without hints</span></p></div>
   <div class="workspace">
     <aside class="setup">
       <section class="card setup-card">
         <h2>Practice settings</h2>
-        <label for="tester">Tester code (optional)</label><input id="tester" type="text" placeholder="P01" maxlength="6" autocomplete="off" aria-describedby="tester-note"><p class="sub" id="tester-note">Use the same code for repeat tests. Leave blank for private practice.</p>
-        <label for="problem">Choose a problem</label><select id="problem" aria-describedby="problem-kind"></select>
-        <p id="problem-kind" class="muted"></p>
-        <div id="generator" hidden>
-          <label for="difficulty">New question difficulty</label>
-          <select id="difficulty"><option value="Warm-up">Basic</option><option value="Multi-step">Multi-step</option><option value="Challenge">Challenge</option></select>
-          <button id="generate" class="full" type="button">Generate a new question</button>
-          <p id="generation-status" class="sub" role="status"></p>
+        <div class="single-only">
+          <label for="tester">Tester code (optional)</label><input id="tester" type="text" placeholder="P01" maxlength="6" autocomplete="off" aria-describedby="tester-note"><p class="sub" id="tester-note">Use the same code for repeat tests. Leave blank for private practice.</p>
         </div>
-        <label for="condition">How would you like help?</label>
-        <select id="condition"><option value="gradual">Try first · step hints</option><option value="immediate">Full worked example</option></select>
-        <p id="mode-description" class="sub">Write your first attempt to unlock a hint.</p>
-        <button id="start" class="primary full">Start practice</button>
-        <p class="setup-note">Starting again creates a separate practice record.</p>
+        <label for="problem">Choose a problem</label><select id="problem" aria-describedby="problem-kind"></select>
+        <div class="single-only">
+          <p id="problem-kind" class="muted"></p>
+          <div id="generator" hidden>
+            <label for="difficulty">New question difficulty</label>
+            <select id="difficulty"><option value="Warm-up">Basic</option><option value="Multi-step">Multi-step</option><option value="Challenge">Challenge</option></select>
+            <button id="generate" class="full" type="button">Generate a new question</button>
+            <p id="generation-status" class="sub" role="status"></p>
+          </div>
+          <label for="condition">How would you like help?</label>
+          <select id="condition"><option value="gradual">Try first · step hints</option><option value="immediate">Full worked example</option></select>
+          <p id="mode-description" class="sub">Write your first attempt to unlock a hint.</p>
+          <button id="start" class="primary full">Start practice</button>
+          <p class="setup-note">Starting again creates a separate practice record.</p>
+        </div>
       </section>
-      <details id="inspector" class="card fold"><summary>Demo controls</summary>
+      <details id="inspector" class="card fold single-only"><summary>Demo controls</summary>
         <label for="equation">Equation sent to the tutor</label><input id="equation" value="2x + 3 = 11" autocomplete="off">
         <label for="version">Input handling</label><select id="version"><option value="revised">Checked input</option><option value="baseline">Before correction: error demonstration</option></select>
         <label class="check"><input type="checkbox" id="equation-feedback" checked>Allow equation feedback</label>
@@ -43,7 +47,23 @@
       </details>
     </aside>
     <div class="learning">
-      <section class="card practice-card" id="practice">
+      <section class="card system-challenge" id="two-variable" aria-labelledby="system-title" hidden>
+        <h2 id="system-title">Two-variable challenge</h2>
+        <p>Find the pair that satisfies both equations.</p>
+        <div class="equation system-equations"><div>3x + 2y = 7</div><div>2x − 3y = 9</div></div>
+        <details><summary>Elimination hint</summary><p>Multiply the first equation by 3 and the second by 2. Add the results to cancel y.</p></details>
+        <details><summary>Substitution hint</summary><p>From the first equation, y = (7 − 3x)/2. Substitute this expression for y in the second equation.</p></details>
+        <form id="system-answer">
+          <div class="system-coordinates">
+            <label>x<input id="system-x" maxlength="50" autocomplete="off"></label>
+            <label>y<input id="system-y" maxlength="50" autocomplete="off"></label>
+          </div>
+          <button class="primary">Check both equations</button>
+          <p class="feedback" id="system-feedback" role="status" hidden></p>
+        </form>
+        <p class="sub">Extra practice outside the two help modes. Answers stay on this page.</p>
+      </section>
+      <section class="card practice-card single-only" id="practice">
         <div class="card-top"><span class="eyebrow">Your working</span><span id="practice-state" class="pill">Ready to start</span></div>
         <p class="question-label">Solve for x</p><h2 id="current-equation" class="equation">2x + 3 = 11</h2>
         <p id="progress" class="muted">Choose how you want help, then start.</p>
@@ -59,13 +79,13 @@
         <p id="export-status" class="sub" aria-live="polite"></p>
         <details class="events"><summary>View practice events</summary><ul id="events"></ul></details>
       </section>
-        <aside class="card hint-card" aria-labelledby="worked-heading"><div class="help-top"><h2 id="worked-heading">Worked steps</h2><span id="hint-count" class="muted">0 of 3 shown</span></div>
+        <aside class="card hint-card single-only" aria-labelledby="worked-heading"><div class="help-top"><h2 id="worked-heading">Worked steps</h2><span id="hint-count" class="muted">0 of 3 shown</span></div>
           <progress id="hint-progress" max="3" value="0" aria-label="Worked steps visible"></progress>
           <p id="steps-empty" class="empty">You can refer back to each step you open.</p>
           <ol id="steps" class="steps"></ol>
           <button id="hint" class="primary" disabled>Reveal next step <span aria-hidden="true">→</span></button>
         </aside>
-      <section class="card independent-card" id="independent" hidden>
+      <section class="card independent-card single-only" id="independent" hidden>
         <h2>Try one on your own</h2>
         <label for="transfer">Choose a new question</label><select id="transfer"></select>
         <p id="transfer-equation" class="equation small-equation">4x + 1 = 13</p>
@@ -76,23 +96,6 @@
       </section>
     </div>
   </div>
-  <section class="card system-challenge" id="two-variable" aria-labelledby="system-title" hidden>
-    <a class="offline" href="#practice">Back to practice</a>
-    <h1 id="system-title" tabindex="-1">Two-variable challenge</h1>
-    <p>Find the pair that satisfies both equations.</p>
-    <div class="equation system-equations"><div>3x + 2y = 7</div><div>2x − 3y = 9</div></div>
-    <details><summary>Elimination hint</summary><p>Multiply the first equation by 3 and the second by 2. Add the results to cancel y.</p></details>
-    <details><summary>Substitution hint</summary><p>From the first equation, y = (7 − 3x)/2. Substitute this expression for y in the second equation.</p></details>
-    <form id="system-answer">
-      <div class="system-coordinates">
-        <label>x<input id="system-x" maxlength="50" autocomplete="off"></label>
-        <label>y<input id="system-y" maxlength="50" autocomplete="off"></label>
-      </div>
-      <button class="primary">Check both equations</button>
-      <p class="feedback" id="system-feedback" role="status" hidden></p>
-    </form>
-    <p class="sub">Extra practice outside the two help modes. Answers stay on this page.</p>
-  </section>
   <p id="error" class="error-banner" role="alert" hidden></p>
   <footer><details id="about"><summary>About this prototype and your records</summary><p>Thirteen practice equations each have a paired independent question. The challenge set combines fractions, brackets and variables on both sides. The checker and worked steps run locally.</p><p>Operation counts and outcomes can be saved on this computer. Your free-text working and session access tokens are excluded from the saved trace. The software checks and sample CSV files are developer demonstrations. A participant study remains future work.</p></details></footer>
 </main>
