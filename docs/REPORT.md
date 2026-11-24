@@ -2,17 +2,17 @@
 
 IIS A2 Project Report
 
-Word count: 1188 total (124 abstract, 1064 main text including headings and disclosures).
+Word count: 1198 total (130 abstract, 1068 main text including headings and disclosures).
 
 ## Abstract
 
-How much help should a tutor give a student who is halfway through an equation? This local browser tutor offers two ways to work through the same algebra problem. Students can submit a first attempt and reveal one step at a time, or open the complete worked example at the start. Thirteen practice equations each have a different question for independent practice. Four harder pairs cover common denominators, nested brackets and decimal coefficients. The program checks whether a submitted equation has the same solution as the original and lets the student revisit earlier hints. A local response function delivers the worked steps. Development tests checked the mathematics and the interaction. Whether either mode helps students solve a new equation independently remains an open question.
+How much help should a tutor give a student who is halfway through an equation? This local browser tutor offers two ways to work through the same algebra problem. Students can submit a first attempt and reveal one step at a time, or open the complete worked example at the start. Each of the thirteen built-in equations has a partner for independent practice. Four harder pairs cover common denominators, nested brackets and decimal coefficients. The program checks whether a submitted equation has the same solution as the original and lets the student revisit earlier hints. A local response function delivers the worked steps. An observer can compare the first and latest independent answers from labelled sessions. Whether either mode helps students solve a new equation independently remains an open question.
 
 ## Problem and scope
 
 A1 asked whether students who attempt a problem before seeing help can later solve a related problem independently. Koedinger and Aleven (2007) describe the difficulty of deciding when to give information and when to leave the next move to the learner. The intended users here are university students revising algebra. For a student who can already solve a two-step equation mentally, opening a hint says little about the value of the help. The harder items give that student a reason to pause, particularly when a minus sign applies to an entire bracket.
 
-The prototype grew out of the Lab4 tutor. In a later trial, image import read only the final number in a screenshot of a simple equation. That left the learner correcting the transcription before they could try any algebra. Returning to a fixed catalogue keeps the equation identical across help modes. It also makes an error easier to locate: the author can check the question, the learner’s line and the next hint against one another. The original lab and its reuse are documented in the project’s provenance record.
+The prototype grew out of the Lab4 tutor. In a later trial, image import read only the final number in a screenshot of a simple equation. That left the learner correcting the transcription before they could try any algebra. Each saved question stays the same across modes, including locally generated pairs. It also makes an error easier to locate: the author can check the question, the learner’s line and the next hint against one another. The original lab and its reuse are documented in the project’s provenance record.
 
 ## Design choices and supporting evidence
 
@@ -48,17 +48,17 @@ Figure 3. Equation feedback flags a changed solution and recognises a corrected 
 
 ![story-3](figures/story-3.png)
 
-Figure 4. Unaided practice and an actual trace export are demonstrated separately from research outcomes.
+Figure 4. The observer sees P01’s first independent answer and the result after a retry.
 
 ## Development evidence and limits
 
-The tutor records which condition was selected, how many hints were opened, whether a checked line preserved the solution and the outcome of each valid answer check. The student can download the current session as a CSV. A random identifier links events within a session. Saved files omit the student’s free-text working. Timing starts at the first recorded event and excludes time spent choosing the question or help mode.
+An observer opens Live results in a second tab on the same computer. Each labelled session has a row showing the tester code, question, help mode, attempts and steps shown. For the assigned independent question, the first valid answer stays visible alongside the latest result. A correct retry cannot overwrite an incorrect first answer. The view refreshes every two seconds. Sessions started without a tester code stay off the board.
 
 The catalogue is checked at startup. Each authored intermediate equation must preserve the original solution, and the final substitution must balance. This matters on A13, where multiplying through by twelve still leaves brackets to expand. A plausible final fraction would be poor reassurance if the hint immediately before it contained a sign error. The checker verifies both the practice answer and the independently authored partner’s answer.
 
-All 41 unit tests passed. A browser walkthrough then exercised each of the four new pairs. It submitted a labelled intermediate step, requested one hint, entered an incorrect final answer and corrected it. It also checked the paired independent answer and opened the complete solution in immediate mode. These runs establish what the software did with known inputs. They provide no observations of how students chose strategies or used hints.
+All 45 unit tests passed. In a browser test, P01 and P02 used separate sessions while an observer watched a third page. On T01, P01 submitted 1 and then 3. The observer saw an incorrect first answer and a correct latest answer without refreshing the page. Filtering for P02 showed its own record. These codes identify automated test sessions. The tests establish that the tutor keeps the records separate.
 
-Bastani et al. (2025) measured performance after assistance was withdrawn. Their distinction matters here because students can retry the independent exercise and receive immediate feedback. A study would need to record a first unaided response under agreed conditions, assess prior knowledge and assign the help mode before practice. The challenge pairs also need piloting with the intended learners. Their extra algebraic steps are verified. Their difficulty for that population, and any effect on later learning, remain to be measured.
+Bastani et al. (2025) measured performance after assistance was withdrawn. Their distinction matters here because students can retry the independent exercise and receive immediate feedback. A study would still need consistent conditions for the first unaided response, a measure of prior knowledge and a way to assign the help mode before practice. The challenge pairs also need piloting with the intended learners. Their extra algebraic steps are verified. Their difficulty for that population, and any effect on later learning, remain to be measured.
 
 ## AI assistance
 
@@ -66,7 +66,7 @@ OpenAI Codex assisted with implementation, exercise drafting, software checks an
 
 ## Repository and submitted version
 
-Local application revision c887f9f on the algebra-only branch. The README gives run instructions and links to the development record. Public repository and README URLs are outstanding.
+Local application revision c3acf27 on the algebra-live-results branch. The README gives run instructions and links to the development record. Public repository and README URLs are outstanding.
 
 ## References
 
