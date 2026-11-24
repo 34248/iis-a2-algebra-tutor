@@ -1,58 +1,72 @@
 # Controlled Help in an Algebra Tutoring Prototype
 
-Word count: 1204 total; abstract 134; main 1070. The formatted report count conservatively includes headings, AI acknowledgement and repository status.
+IIS A2 Project Report
+
+Word count: 1188 total (124 abstract, 1064 main text including headings and disclosures).
 
 ## Abstract
 
-This project explores how an introductory algebra tutor can offer help while leaving students an opportunity to attempt a problem. It develops A1 into a local browser prototype with attempt-first gradual help and an immediate worked solution, using identical checked content. Nine practice equations and nine paired unaided items cover integers, signs, fractions and multi-step working. An implemented rule-based checker tests whether a proposed linear equation preserves the original solution. It does not grade written reasoning. The interface supports correction, persistent steps, completion feedback and local CSV export without saving free-text working. Equation feedback can be disabled in both conditions for a presentation-only comparison. The language-model response boundary remains simulated; no live model is connected. Software checks demonstrate behaviour, not learning effectiveness. Prior-knowledge measurement, assigned conditions and a controlled participant comparison remain future work.
+How much help should a tutor give a student who is halfway through an equation? This local browser tutor offers two ways to work through the same algebra problem. Students can submit a first attempt and reveal one step at a time, or open the complete worked example at the start. Thirteen practice equations each have a different question for independent practice. Four harder pairs cover common denominators, nested brackets and decimal coefficients. The program checks whether a submitted equation has the same solution as the original and lets the student revisit earlier hints. A local response function delivers the worked steps. Development tests checked the mathematics and the interaction. Whether either mode helps students solve a new equation independently remains an open question.
 
 ## Problem and scope
 
-Completing an equation with assistance does not establish independent problem solving. A1 proposed comparing help presentation while holding solution content fixed. Koedinger and Aleven’s (2007) assistance dilemma motivates preserving thinking opportunities alongside guidance. Intended users are university students revising introductory algebra. The authored set now has nine practice equations and nine paired unaided items, including brackets, fractions and variables on both sides. This extends an overly small two-item demonstration. Learners already proficient in these skills may score near the ceiling; a future study must assess prior knowledge rather than assume these tasks are challenging.
+A1 asked whether students who attempt a problem before seeing help can later solve a related problem independently. Koedinger and Aleven (2007) describe the difficulty of deciding when to give information and when to leave the next move to the learner. The intended users here are university students revising algebra. For a student who can already solve a two-step equation mentally, opening a hint says little about the value of the help. The harder items give that student a reason to pause, particularly when a minus sign applies to an entire bracket.
 
-The starting point was the A1-aligned Lab4 tutor. A2 retains its algebra workflow to keep the prototype focused on the submitted research question. Unrelated retrieval, scheduling and image exercises are excluded. Development added trace export, response validation, equation checks and a clearer practice-to-unaided flow. Original source fingerprints and the Lab4 commit are in docs/PROVENANCE.md; the original lab remains separate.
+The prototype grew out of the Lab4 tutor. In a later trial, image import read only the final number in a screenshot of a simple equation. That left the learner correcting the transcription before they could try any algebra. Returning to a fixed catalogue keeps the equation identical across help modes. It also makes an error easier to locate: the author can check the question, the learner’s line and the next hint against one another. The original lab and its reuse are documented in the project’s provenance record.
 
 ## Design choices and supporting evidence
 
-Gradual mode requires a nonempty attempt before the first requested hint. Each subsequent request reveals one more checked step; immediate mode displays the same steps together. This preserves the combined comparison proposed in A1. Atkinson, Renkl and Merrill (2003) found transfer benefits from fading worked steps combined with self-explanation prompts, but their intervention does not establish the effect of this interface. Sale and Muldner (2019) found no significant overall learning difference between their hint conditions. These results support testing the choice without assuming that less assistance must improve learning. A live generator could vary wording and introduce incorrect steps. Fixed content makes the presentation comparison inspectable, at the cost of open-ended conversation and personalised explanations.
+Both modes use the same authored solution. In gradual mode, submitting an attempt unlocks the first hint. Students decide when to request each subsequent step. Immediate mode displays the whole sequence at once. Atkinson, Renkl and Merrill (2003) studied the transition from examples to independent problem solving using fading and self-explanation prompts. The present tutor changes when steps appear. Sale and Muldner (2019) found no significant overall difference between the two kinds of algebra hint they tested. These studies leave room for either outcome in a comparison of the present modes.
 
-Released steps remain visible, with progress and attempt feedback. Week 2’s working-memory and external-state concepts informed this choice: users should not need to remember previously released help (University of Birmingham, 2026). That possible benefit has not been measured. Written explanations remain ungraded. Optional equation checks test algebraic equivalence using exact arithmetic; they cannot assess why a learner chose an operation. Checking a line releases no worked step. Learners request each hint themselves; this preserves control but may add effort or delay.
+A learner clearing denominators may want to check the multiplier while expanding the next bracket. Earlier steps therefore stay on screen. This applies the Week 2 discussion of working memory and information held in the interface (University of Birmingham, 2026). The cost of gradual release is an extra action for each hint. A student who wants to inspect the whole derivation can choose the worked example before starting. Changing the help mode starts a fresh record so that the two kinds of practice can be inspected separately.
 
-Scope disclosure and recovery follow Amershi et al.’s (2019) guidelines on capability clarity, correction and limiting services when uncertain. The header identifies fixed content and simulated responses. The revised backend checks the complete equation against the selected item before releasing any step. An incomplete equation produces an editable correction request. The retained baseline deliberately skips that check to demonstrate the defect; it is an inspection option, not evidence of an observed commercial-model failure. A restart establishes a new session so conditions and progress cannot silently mix.
+## Design choices continued
 
-Kim et al. (2009) reported an interaction between tutorial method and conceptual versus procedural knowledge. Accordingly, numeric correctness and equation equivalence are kept separate from conceptual understanding. The checker reduces each supported expression to a linear form and compares unique solutions. This is implemented reasoning over a restricted grammar, not language-model understanding. A future explanation task needs a scoring rubric and appropriate checking. A correct number or equivalent equation alone cannot establish understanding.
+The checker tests a narrow mathematical claim. For example, on A10 the learner can enter “Multiply both sides by 12” followed by a colon and the new equation. The program reads the equation after the colon and compares its unique rational solution with the original. An incorrect verbal explanation could still accompany an equivalent equation. Kim et al. (2009) distinguish procedural and conceptual outcomes in their comparison of tutoring and worked examples. Assessing a student’s justification would require a separate task and a marking rubric.
 
-## Architecture and illustrated interaction
+Amershi et al. (2019) recommend making system capabilities clear and supporting correction. An incomplete equation produces a prompt to edit it. A well-formed step that changes the solution produces different feedback: the student can revisit the signs or check that the same operation was applied to both sides. Neither action opens a hint. Students can also record a short explanation and continue. The comparison setting allows equation feedback to be switched off for both groups if the study concerns only the presentation of help.
 
-Figure 1 shows the boundaries. The browser sends the equation, condition and action to a local Python controller. algebra.py checks supported linear expressions; the authored catalog is also verified at startup. The controller passes checked data and a reveal count to an offline response function, validates the returned prefix and supplies its own acknowledgement. Unexpected output releases no new step. This applies Week 3’s distinction between model instructions, supplied data and application enforcement (University of Birmingham, 2026). The implemented checker and simulated response function are labelled separately.
+## Architecture and interaction
 
-Example 1 shows an equation check followed by one requested hint, contrasted with immediate display. Example 2 flags a changed solution and accepts a corrected equivalent line without revealing further help. Example 3 moves from a solved practice item to its paired unaided question and exports the trace. Answer checks use exact rational arithmetic. Injected response failure preserves earlier steps. Demo controls are folded away from the main learner flow.
+Figure 1 follows a request from the browser to the local controller. The controller checks the selected problem, looks up its authored steps and asks the simulated response function for the permitted portion. It checks the returned sequence before displaying it. A missing or malformed response leaves earlier hints available. This implements the Week 3 distinction between giving a model instructions and enforcing the allowed output in the application (University of Birmingham, 2026). The browser offers English or bilingual English–Chinese labels for the same exercises.
 
-![Architecture](figures/architecture.png)
+Figures 2–4 show three interactions using the shorter equations. The same sequence also works on A10. Multiplying its three fractions by twelve gives 3(3x − 2) − 2(x + 1) = 4(x − 1). The negative multiplier on the second bracket is easy to miss. The student can check that line before revealing the expansion. After the final answer, 4/3, the tutor offers T10. Its coefficients and solution differ, so copying the practice answer will fail.
 
-![Interaction 1](figures/story-1.png)
+![architecture](figures/architecture.png)
 
-![Interaction 2](figures/story-2.png)
+Figure 1. Implemented controls, the simulated tutor boundary and the planned participant study.
 
-![Interaction 3](figures/story-3.png)
+## Illustrated interaction
+
+![story-1](figures/story-1.png)
+
+Figure 2. One requested hint and the immediate solution use the same checked content.
+
+![story-2](figures/story-2.png)
+
+Figure 3. Equation feedback flags a changed solution and recognises a corrected equivalent line.
+
+![story-3](figures/story-3.png)
+
+Figure 4. Unaided practice and an actual trace export are demonstrated separately from research outcomes.
 
 ## Development evidence and limits
 
-Local traces contain timestamps, elapsed time, condition, event type, attempts, released-step counts, equation-check results and valid answer outcomes. A random trace identifier links a session without a name or email address. Free-text working stays in process memory and is excluded from saved JSONL and exported CSV. Server restart resets practice state; saved traces remain until deleted. Export is scoped to the active session. These records are technical interaction evidence, not a secure multi-user research dataset.
+The tutor records which condition was selected, how many hints were opened, whether a checked line preserved the solution and the outcome of each valid answer check. The student can download the current session as a CSV. A random identifier links events within a session. Saved files omit the student’s free-text working. Timing starts at the first recorded event and excludes time spent choosing the question or help mode.
 
-The timer begins when a practice session first records an event. It therefore excludes setup time and cannot establish total task effort. Restarting creates a different trace rather than silently appending a second condition. No automatic group allocation, participant consent workflow or effort questionnaire is implemented. These omissions matter when interpreting exported records: a sequence of successful software actions cannot be reported as an independently administered learning experiment.
+The catalogue is checked at startup. Each authored intermediate equation must preserve the original solution, and the final substitution must balance. This matters on A13, where multiplying through by twelve still leaves brackets to expand. A plausible final fraction would be poor reassurance if the hint immediately before it contained a sign error. The checker verifies both the practice answer and the independently authored partner’s answer.
 
-The version passes 40 code tests and 32 browser checks. These cover authored answers and substitution checks, equivalent and incorrect lines, unsupported syntax, identical help content, response failures, session isolation, mobile layout and actual downloads. Demonstration files are labelled developer_demo or developer_check. They contain no participant observations. Review corrected malformed-answer scoring, declined-output release and stale feedback. A shared lock keeps state updates and traces consistent. Disk-write failure still permits CSV download. The expanded workflow and comparison setting were then checked in the browser. The README records reused work, assistance and corrections.
+All 41 unit tests passed. A browser walkthrough then exercised each of the four new pairs. It submitted a labelled intermediate step, requested one hint, entered an incorrect final answer and corrected it. It also checked the paired independent answer and opened the complete solution in immediate mode. These runs establish what the software did with known inputs. They provide no observations of how students chose strategies or used hints.
 
-Bastani et al. (2025) motivate separating assisted from later unaided performance. Current unaided practice allows retries and immediate feedback, so it is not a controlled post-test. Equation feedback can be disabled in both conditions, with that setting recorded, to retain A1’s narrower comparison. A future study still needs suitable recruitment, prior-knowledge measurement, assigned conditions, fixed tasks, first-response scoring and effort measures. Its analysis must report uncertainty. The combined attempt requirement and release sequence cannot be separated. No learning improvement or retention benefit is claimed; docs/RESEARCH_PROTOCOL.md identifies these remaining gaps.
+Bastani et al. (2025) measured performance after assistance was withdrawn. Their distinction matters here because students can retry the independent exercise and receive immediate feedback. A study would need to record a first unaided response under agreed conditions, assess prior knowledge and assign the help mode before practice. The challenge pairs also need piloting with the intended learners. Their extra algebraic steps are verified. Their difficulty for that population, and any effect on later learning, remain to be measured.
 
 ## AI assistance
 
-OpenAI Codex assisted with implementation, tests, evidence capture, literature checks, drafting and language revision. Automated demonstrations are labelled separately from participant data. The README records the checks and changes.
+OpenAI Codex assisted with implementation, exercise drafting, software checks and report editing. The authored steps were checked by exact arithmetic and the new practice flows were exercised in a browser. The examples in the development record come from these runs.
 
 ## Repository and submitted version
 
-Local review release: a2-review-v5. Public repository and README links remain outstanding. The README links the development record and inspection walkthrough; this is not yet a submission-ready release.
+Local application revision c887f9f on the algebra-only branch. The README gives run instructions and links to the development record. Public repository and README URLs are outstanding.
 
 ## References
 
