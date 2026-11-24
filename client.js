@@ -4,6 +4,7 @@ let config = null;
 let busy = false;
 let current = null;
 let checkedWorking = null;
+let checkedLocations = [];
 const topicNote = difficulty => ({'Warm-up': 'Two-step equations with whole numbers.', 'Signed numbers': 'Practise signs and negative values.', 'Fractions': 'Work with fractional values and coefficients.', 'Challenge': 'Practise clearing denominators, nested brackets and decimal coefficients.', 'Multi-step': 'Work with brackets, fractions and x on both sides.'})[difficulty];
 
 function node(tag, text) {
@@ -73,7 +74,11 @@ function render(result) {
         const item = document.createElement('li');
         item.dataset.status = check.equivalent ? 'good' : 'warn';
         const label = check.equivalent ? 'correct' : check.valid ? 'changes the solution' : 'cannot check';
-        item.append(node('strong', 'Line ' + check.line + ' · ' + label));
+        const location = checkedLocations[check.line - 1];
+        const position = location ? location.line : check.line;
+        const part = location?.part ? ', step ' + location.part : '';
+        item.append(node('strong', 'Line ' + position + part + ' · ' + label));
+        if (part) item.append(' ', node('code', location.equation));
         if (!check.equivalent) item.append(node('div', check.reply));
         list.append(item);
       }
@@ -162,10 +167,47 @@ bind('save-attempt', async () => {
   render(await api('/api/action', {session, action: 'attempt', attempt: $('attempt').value}));
 });
 
+// The checker accepts one equation per row. Split only at an unambiguous
+// gap between consecutive equals signs, retaining the visible line numbers.
+function splitWorkingLine(line) {
+  const equals = [...line.matchAll(/=/g)].map(match => match.index);
+  const steps = [];
+  let start = 0;
+  for (let i = 1; i < equals.length; i++) {
+    const between = line.slice(equals[i - 1] + 1, equals[i]);
+    let depth = 0;
+    const boundaries = [];
+    for (const token of between.matchAll(/[()]|\s+/g)) {
+      if (token[0] === '(') depth++;
+      else if (token[0] === ')') depth--;
+      else if (depth === 0 && /[\dx)]$/i.test(between.slice(0, token.index))
+          && /^[\dx(]/i.test(between.slice(token.index + token[0].length))) {
+        boundaries.push(token.index);
+      }
+    }
+    if (boundaries.length !== 1) return [line];
+    const end = equals[i - 1] + 1 + boundaries[0];
+    steps.push(line.slice(start, end).trim());
+    start = end;
+  }
+  steps.push(line.slice(start).trim());
+  return steps;
+}
+
 bind('check-step', async () => {
   const submitted = $('attempt').value;
+  const locations = submitted.split('\n').flatMap((line, index) => {
+    const parts = splitWorkingLine(line);
+    return parts.map((equation, i) => ({
+      line: index + 1, part: parts.length > 1 ? i + 1 : 0, equation
+    }));
+  });
+  const result = await api('/api/action', {
+    session, action: 'check_step', attempt: locations.map(entry => entry.equation).join('\n')
+  });
   checkedWorking = submitted;
-  render(await api('/api/action', {session, action: 'check_step', attempt: submitted}));
+  checkedLocations = locations;
+  render(result);
   if ($('attempt').value !== submitted) {
     $('step-feedback').hidden = true;
     $('reply').textContent = 'Your working changed while checking. Check the current line again.';
@@ -328,7 +370,7 @@ function installBilingualView() {
     'Check my steps': '检查我的步骤',
     'All steps preserve the solution.': '所有步骤都与原方程同解。',
     'Review the marked lines.': '请检查标出的行。',
-    'Write one equation per line. Keep earlier steps as you go.': '每行写一个方程，前面的步骤可以保留。',
+    'Continue on a new line or separate complete equations with a space.': '可以换行，也可以用空格隔开两个完整方程。',
     'Record explanation': '记录思路',
     'Check whether your equation has the same solution. You can also save a written explanation without grading it.': '检查变形后的方程与原方程是否同解。文字思路可以保存，不计分。',
     'Worked steps': '解题步骤',
@@ -375,6 +417,8 @@ function installBilingualView() {
     'Enter a number or fraction, optionally starting with x =.': '请输入数字或分数，也可以用 x = 开头。',
   }));
   const patterns = [
+    [/^Line (\d+), step (\d+) · (correct|changes the solution|cannot check)$/, (_, n, part, status) =>
+      '第 ' + n + ' 行第 ' + part + ' 步 · ' + ({'correct':'正确','changes the solution':'改变了原解','cannot check':'无法判断'})[status]],
     [/^Line (\d+) · (correct|changes the solution|cannot check)$/, (_, n, status) =>
       '第 ' + n + ' 行 · ' + ({'correct':'正确','changes the solution':'改变了原解','cannot check':'无法判断'})[status]],
     [/^([AT]\d+) · (Warm-up|Multi-step|Signed numbers|Fractions|Challenge)$/, (_, id, topic) => ({'Challenge':'挑战题','Warm-up':'基础题','Multi-step':'多步运算','Signed numbers':'正负数','Fractions':'分数'})[topic]],
