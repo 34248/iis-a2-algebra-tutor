@@ -31,5 +31,5 @@ class GeneratedPracticeTests(unittest.TestCase):
             gradual = app.start(dict(payload, condition='gradual'))
             app.action({'session': gradual['session'], 'action': 'attempt', 'attempt': 'first attempt'})
             result = app.action({'session': gradual['session'], 'action': 'hint'})
-            self.assertEqual(result['steps'], full['steps'][:1])
+            self.assertEqual(result['steps'], [full['steps'][0].split(':')[0]])
             self.assertEqual(full['transfer_id'], t['id'])

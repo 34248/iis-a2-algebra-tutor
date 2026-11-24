@@ -51,3 +51,5 @@ main > .language-switch { float: right; margin: 0 0 8px 10px; }
 .results select { max-width:250px; }
 #tester-note { min-height:0; }
 #generation-status:empty { display:none; }
+
+.results td:nth-child(3) { min-width:13rem; }

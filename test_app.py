@@ -11,12 +11,16 @@ class TutorChecks(unittest.TestCase):
         d=self.start();self.assertEqual(d['steps'],[]);first=self.act(d,'hint');self.assertEqual(first['shown'],1);self.assertEqual(first['attempt_count'],0)
     def test_attempt_then_one_step_at_a_time(self):
         d=self.start();self.act(d,'attempt',attempt='Subtract 3');self.assertEqual(self.act(d,'hint')['shown'],1);self.assertEqual(self.act(d,'hint')['shown'],2)
-    def test_conditions_share_identical_checked_content(self):
+    def test_gradual_hints_hide_results_until_correct_and_immediate_shows_working(self):
         for p in app.PROBLEMS.values():
             a=self.start(problem_id=p['id'],question=p['question']);b=self.start(problem_id=p['id'],question=p['question'],condition='immediate')
             self.act(a,'attempt',attempt='Try isolating x')
             for _ in p['steps']:a=self.act(a,'hint')
-            self.assertEqual(a['steps'],b['steps']);self.assertFalse(a['next_hint_allowed'])
+            self.assertEqual(b['steps'],p['steps']);self.assertEqual(a['steps'],[s.split(':')[0] for s in p['steps']]);self.assertFalse(a['next_hint_allowed'])
+            self.assertTrue(all('=' not in cue for cue in a['steps']))
+            self.assertIsNone(a['confirmed_answer']);self.assertEqual(b['worked_solution'],[])
+            done=self.act(a,'check',answer=str(p['answer']))
+            self.assertEqual(done['confirmed_answer'],str(p['answer']));self.assertEqual(done['worked_solution'],p['steps'])
     def test_revised_rejects_incomplete_input(self):
         d=self.start(question='2x + = 11');self.assertEqual(d['status'],'blocked');self.assertEqual(d['steps'],[])
         with self.assertRaises(app.UserError):self.act(d,'hint')

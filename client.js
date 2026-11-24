@@ -90,6 +90,9 @@ function render(result) {
     $('step-feedback').dataset.status = feedback.equivalent ? 'good' : 'warn';
   }
   $('completion').hidden = !result.solved;
+  $('confirmed-answer').textContent = result.solved ? 'x = ' + result.confirmed_answer : '';
+  $('worked-solution').replaceChildren(...result.worked_solution.map(step => node('li', step)));
+  if (!result.solved) $('review-solution').open = false;
   $('completion-summary').textContent = `${result.answer_checks} valid answer check${result.answer_checks === 1 ? '' : 's'} · ${result.shown} of ${result.total_steps} worked steps viewed. Try the paired question next.`;
   $('start').textContent = 'Start fresh';
   if (newSession) {
@@ -389,6 +392,10 @@ function installBilingualView() {
     'Use up to 6 letters or digits, e.g. 03. Reuse your code for repeat tests or leave it blank for private practice.': '编号可用 1 至 6 位英文字母或数字，例如 03。重复测试用同一编号，留空则只自己练习。',
     'Use up to 6 letters or digits, or leave the code blank.': '请填写最多 6 位英文字母或数字，也可留空。',
     'Live results': '实时结果',
+    'Review the worked solution': '查看完整解法',
+    'Combine the constant terms': '合并常数项', 'Collect like terms': '合并同类项',
+    'Collect the x terms': '合并含 x 的项', 'Expand the brackets': '展开括号',
+    'Check by substitution': '把你算出的值代回原方程检验',
     'How helpful were the worked steps during practice? (optional)': '刚才练习时，给出的解题步骤对你有多大帮助？（选填）',
     'Choose a rating': '选择评价', 'Not helpful': '没有帮助', 'A little helpful': '有一点帮助',
     'Very helpful': '很有帮助', 'I did not view the steps': '没看步骤',
@@ -485,6 +492,8 @@ function installBilingualView() {
     'Enter a number or fraction, optionally starting with x =.': '请输入数字或分数，也可以用 x = 开头。',
   }));
   const patterns = [
+    [/^(Subtract|Add) (.+?) (?:from|to) both sides$/, (_, op, v) => '两边都' + (op === 'Add' ? '加上 ' : '减去 ') + v],
+    [/^(Divide|Multiply) both sides by (.+?)$/, (_, op, v) => '两边都' + (op === 'Divide' ? '除以 ' : '乘以 ') + v],
     [/^(\d+) practice items$/, (_, n) => n + ' 道练习题'],
     [/^(\d+) new questions without hints$/, (_, n) => n + ' 道无提示新题'],
     [/^Line (\d+), step (\d+) · (correct|changes the solution|cannot check)$/, (_, n, part, status) =>

@@ -22,7 +22,7 @@ function render() {
   const rows = sessions.filter(s => !filter.value || s.tester === filter.value);
   byId('rows').replaceChildren(...rows.map(s => {
     const row = document.createElement('tr');
-    const values = [s.tester,new Date(s.started).toLocaleString(),s.problem,
+    const values = [s.tester,new Date(s.started).toLocaleString(),s.equation || label('Equation unavailable','题面未保存'),
       s.mode === 'gradual' ? label('Step hints','逐步提示') : label('Full example','完整例题'),
       s.attempts,s.shown,outcome(s.practice),outcome(s.independent_first),outcome(s.independent_latest),
       label(...(ratings[s.help_rating] || ['Not rated','未评价']))];
@@ -30,8 +30,8 @@ function render() {
     return row;
   }));
   byId('empty').hidden = rows.length > 0 || !lastUpdate;
-  byId('empty').textContent = label('No labelled sessions yet. Enter 03 on the practice page and start a question.',
-                                    '尚无测试记录。在练习页输入 03，再点击开始练习。');
+  byId('empty').textContent = label('No completed practice yet. A row appears when a tester submits the correct final answer.',
+                                    '暂无已完成练习。填写编号的测试者答对练习题后，这里会显示结果。');
   byId('sync').textContent = failed ? label('Connection lost. Retrying…','连接中断，正在重试…') :
     lastUpdate ? label('Updated every 2 seconds','每 2 秒更新') + ' · ' + lastUpdate.toLocaleTimeString() : label('Loading…','加载中…');
 }

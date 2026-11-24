@@ -79,11 +79,15 @@ def session_for(payload):
 
 def public(state, reply=''):
     problem = PROBLEMS[state['problem_id']]
+    solved = state['final_correct'] is True
+    visible_steps = list(state['steps'])
+    if not solved and state['condition'] == 'gradual':
+        visible_steps = [step.split(':', 1)[0] for step in visible_steps]
     return {
         'session': state['session'], 'problem_id': problem['id'],
         'question_received': state['question'], 'condition': state['condition'],
         'version': state['version'], 'status': state['status'],
-        'reply': reply or state['reply'], 'steps': copy.deepcopy(state['steps']),
+        'reply': reply or state['reply'], 'steps': visible_steps,
         'shown': len(state['steps']), 'total_steps': len(problem['steps']),
         'attempt_count': len(state['attempts']),
         'events': copy.deepcopy(state['events']),
@@ -94,7 +98,8 @@ def public(state, reply=''):
         'step_feedback': copy.deepcopy(state['step_feedback']),
         'equation_feedback': state['equation_feedback'],
         'step_checks': state['step_checks'], 'answer_checks': state['answer_checks'],
-        'solved': state['final_correct'] is True,
+        'solved': solved, 'confirmed_answer': str(problem['answer']) if solved else None,
+        'worked_solution': list(problem['steps']) if solved else [],
         'transfer_id': problem['transfer_id'], 'difficulty': problem['difficulty'],
     }
 
@@ -151,6 +156,7 @@ def _start(payload):
         raise UserError('Use up to 6 letters or digits, or leave the code blank.')
     state = {
         'tester': tester.strip().upper(), 'paired_problem': PROBLEMS[pid]['transfer_id'],
+        'practice_equation': PROBLEMS[pid]['question'],
         'session': secrets.token_urlsafe(24), 'problem_id': pid,
         'question': question, 'condition': condition, 'version': version,
         'status': 'ready', 'steps': [], 'attempts': [], 'events': [], 'reply': '',
@@ -357,7 +363,7 @@ class Handler(BaseHTTPRequestHandler):
             if self.headers.get('Host') not in {f'127.0.0.1:{self.server.server_port}', f'localhost:{self.server.server_port}'}:
                 return self.respond({'error':'Use the local results page.'}, 403)
             with telemetry.LOCK:
-                sessions = live_results.snapshot()
+                sessions = live_results.snapshot(PROBLEMS)
             return self.respond({'sessions': sessions})
         if route == '/api/config':
             with LOCK:
