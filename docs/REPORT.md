@@ -2,11 +2,11 @@
 
 IIS A2 Project Report
 
-Word count: 1198 total (130 abstract, 1068 main text including headings and disclosures).
+Word count: 1218 total (132 abstract, 1086 main text including headings and disclosures).
 
 ## Abstract
 
-How much help should a tutor give a student who is halfway through an equation? This local browser tutor offers two ways to work through the same algebra problem. Students can submit a first attempt and reveal one step at a time, or open the complete worked example at the start. Each of the thirteen built-in equations has a partner for independent practice. Four harder pairs cover common denominators, nested brackets and decimal coefficients. The program checks whether a submitted equation has the same solution as the original and lets the student revisit earlier hints. A local response function delivers the worked steps. An observer can compare the first and latest independent answers from labelled sessions. Whether either mode helps students solve a new equation independently remains an open question.
+How much help should a tutor give a student who is halfway through an equation? This local browser tutor offers two ways to work through the same algebra problem. Students can request one step at a time, with or without first submitting an attempt, or open the complete worked example at the start. Each of the thirteen built-in equations has a partner for independent practice. Four harder pairs cover common denominators, nested brackets and decimal coefficients. The program checks whether a submitted equation has the same solution as the original and lets the student revisit earlier hints. A local response function delivers the worked steps. An observer can compare the first and latest independent answers from labelled sessions. Whether either mode helps students solve a new equation independently remains an open question.
 
 ## Problem and scope
 
@@ -16,7 +16,7 @@ The prototype grew out of the Lab4 tutor. In a later trial, image import read on
 
 ## Design choices and supporting evidence
 
-Both modes use the same authored solution. In gradual mode, submitting an attempt unlocks the first hint. Students decide when to request each subsequent step. Immediate mode displays the whole sequence at once. Atkinson, Renkl and Merrill (2003) studied the transition from examples to independent problem solving using fading and self-explanation prompts. The present tutor changes when steps appear. Sale and Muldner (2019) found no significant overall difference between the two kinds of algebra hint they tested. These studies leave room for either outcome in a comparison of the present modes.
+Both modes use the same authored solution. In gradual mode, students decide when to reveal each step. They can ask for the first hint with the working box empty. Immediate mode displays the whole sequence at once. Atkinson, Renkl and Merrill (2003) studied the transition from examples to independent problem solving using fading and self-explanation prompts. The present tutor changes when steps appear. Sale and Muldner (2019) found no significant overall difference between the two kinds of algebra hint they tested. These studies leave room for either outcome in a comparison of the present modes.
 
 A learner clearing denominators may want to check the multiplier while expanding the next bracket. Earlier steps therefore stay on screen. This applies the Week 2 discussion of working memory and information held in the interface (University of Birmingham, 2026). The cost of gradual release is an extra action for each hint. A student who wants to inspect the whole derivation can choose the worked example before starting. Changing the help mode starts a fresh record so that the two kinds of practice can be inspected separately.
 
@@ -52,7 +52,7 @@ Figure 4. The observer sees P01’s first independent answer and the result afte
 
 ## Development evidence and limits
 
-An observer opens Live results in a second tab on the same computer. Each labelled session has a row showing the tester code, question, help mode, attempts and steps shown. For the assigned independent question, the first valid answer stays visible alongside the latest result. A correct retry cannot overwrite an incorrect first answer. The view refreshes every two seconds. Sessions started without a tester code stay off the board.
+An observer opens Live results in a second tab on the same computer. Each labelled session has a row showing the tester code, question, help mode, attempts and steps shown. For the assigned independent question, the first valid answer stays visible alongside the latest result. A correct retry cannot overwrite an incorrect first answer. The view refreshes every two seconds. Sessions started without a tester code stay off the board. After the paired question, students can also rate how helpful they found the steps.
 
 The catalogue is checked at startup. Each authored intermediate equation must preserve the original solution, and the final substitution must balance. This matters on A13, where multiplying through by twelve still leaves brackets to expand. A plausible final fraction would be poor reassurance if the hint immediately before it contained a sign error. The checker verifies both the practice answer and the independently authored partner’s answer.
 
@@ -66,7 +66,7 @@ OpenAI Codex assisted with implementation, exercise drafting, software checks an
 
 ## Repository and submitted version
 
-Local application revision 6c24ce9 on the algebra-live-results branch. The README gives run instructions and links to the development record. Public repository and README URLs are outstanding.
+Local application revision ce3249b on the algebra-live-results branch. The README gives run instructions and links to the development record. Public repository and README URLs are outstanding.
 
 ## References
 
