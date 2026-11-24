@@ -93,6 +93,20 @@ def solution(source):
 
 def check_step(original, proposed):
     expected = solution(original)
+    lines = [(index, line.strip()) for index, line in enumerate(proposed.splitlines(), 1)
+             if line.strip()] if isinstance(proposed, str) else []
+    if len(lines) < 2:
+        return check_line(expected, lines[0][1] if lines else proposed)
+
+    checks = [dict(line=index, **check_line(expected, line)) for index, line in lines]
+    valid = all(check['valid'] for check in checks)
+    equivalent = all(check['equivalent'] for check in checks)
+    return {'valid': valid, 'equivalent': equivalent if valid else None,
+            'isolated': equivalent and checks[-1]['isolated'], 'lines': checks,
+            'reply': 'All steps preserve the solution.' if equivalent else 'Review the marked lines.'}
+
+
+def check_line(expected, proposed):
     # A worked step can include a description before the equation.
     if isinstance(proposed, str) and proposed.count('=') == 1:
         parts = re.split(r'[:：]', proposed, maxsplit=1)

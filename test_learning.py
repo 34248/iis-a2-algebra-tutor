@@ -32,6 +32,17 @@ class EquationChecks(unittest.TestCase):
         self.assertFalse(algebra.check_step(original, 'Subtract 3: 2x = 14')['equivalent'])
         self.assertFalse(algebra.check_step(original, 'x = 9: 2x = 8')['valid'])
 
+    def test_multiline_challenge_keeps_line_numbers_and_checks_every_equation(self):
+        problem = app.PROBLEMS['A10']['question']
+        first = '3(3x-2)-2(x+1)=4(x-1)'
+        second = '9x-6-2x-2=4x-4'
+        result = algebra.check_step(problem, first + '\r\n\r\n' + second)
+        self.assertTrue(result['equivalent'])
+        self.assertEqual([row['line'] for row in result['lines']], [1, 3])
+        result = algebra.check_step(problem, first + '\nx=0\n2x+\n' + second)
+        self.assertFalse(result['valid'])
+        self.assertEqual([row['equivalent'] for row in result['lines']], [True, False, None, True])
+
     def test_exact_decimal_fraction_and_parentheses(self):
         self.assertEqual(algebra.solution('0.1x + 0.2 = 0.5'), Fraction(3))
         self.assertEqual(algebra.solution('2(x + 1) = 10'), Fraction(4))

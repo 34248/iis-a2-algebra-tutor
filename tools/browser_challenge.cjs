@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const {pathToFileURL} = require('node:url');
 (async () => {
   const root = path.join(__dirname, '..');
-  const base = process.env.TUTOR_URL || 'http://127.0.0.1:8766/';
+  const base = process.env.TUTOR_URL || 'http://127.0.0.1:8767/';
   const b = await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE, args:['--no-proxy-server']});
   try {
     const page = await b.newPage({viewport:{width:1400,height:1000}});

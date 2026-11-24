@@ -66,6 +66,19 @@ function render(result) {
   $('reply').hidden = showStepFeedback && result.reply === feedback.reply;
   if (feedback) {
     $('step-feedback').textContent = feedback.reply;
+    if (feedback.lines) {
+      const list = document.createElement('ul');
+      list.className = 'line-results';
+      for (const check of feedback.lines) {
+        const item = document.createElement('li');
+        item.dataset.status = check.equivalent ? 'good' : 'warn';
+        const label = check.equivalent ? 'correct' : check.valid ? 'changes the solution' : 'cannot check';
+        item.append(node('strong', 'Line ' + check.line + ' · ' + label));
+        if (!check.equivalent) item.append(node('div', check.reply));
+        list.append(item);
+      }
+      $('step-feedback').append(list);
+    }
     $('step-feedback').dataset.status = feedback.equivalent ? 'good' : 'warn';
   }
   $('completion').hidden = !result.solved;
@@ -103,6 +116,7 @@ function resetUnassisted() {
 }
 
 function resetPractice(message) {
+  $('independent').hidden = true;
   session = null;
   current = null;
   checkedWorking = null;
@@ -238,6 +252,7 @@ $('try-independent').addEventListener('click', () => {
   if (busy || !current || !current.solved) return;
   $('transfer').value = current.transfer_id;
   resetUnassisted();
+  $('independent').hidden = false;
   $('independent').scrollIntoView({behavior: 'smooth', block: 'start'});
   $('transfer-answer').focus({preventScroll: true});
 });
@@ -308,9 +323,12 @@ function installBilingualView() {
     'Solve for x': '求 x 的值',
     'Choose how you want help, then start.': '选好提示方式后，点击开始练习。',
     'Your working stays here while you practise.': '练习过程中，你写的步骤会保留在这里。',
-    'Your next equation or explanation': '你的下一步方程或解题思路',
+    'Your working or explanation': '你的推导或解题思路',
     'Write a complete equation to check it, or describe your approach.': '输入完整方程以检查这一步，或写下思路。',
-    'Check this equation': '检查这一步',
+    'Check my steps': '检查我的步骤',
+    'All steps preserve the solution.': '所有步骤都与原方程同解。',
+    'Review the marked lines.': '请检查标出的行。',
+    'Write one equation per line. Keep earlier steps as you go.': '每行写一个方程，前面的步骤可以保留。',
     'Record explanation': '记录思路',
     'Check whether your equation has the same solution. You can also save a written explanation without grading it.': '检查变形后的方程与原方程是否同解。文字思路可以保存，不计分。',
     'Worked steps': '解题步骤',
@@ -357,6 +375,8 @@ function installBilingualView() {
     'Enter a number or fraction, optionally starting with x =.': '请输入数字或分数，也可以用 x = 开头。',
   }));
   const patterns = [
+    [/^Line (\d+) · (correct|changes the solution|cannot check)$/, (_, n, status) =>
+      '第 ' + n + ' 行 · ' + ({'correct':'正确','changes the solution':'改变了原解','cannot check':'无法判断'})[status]],
     [/^([AT]\d+) · (Warm-up|Multi-step|Signed numbers|Fractions|Challenge)$/, (_, id, topic) => ({'Challenge':'挑战题','Warm-up':'基础题','Multi-step':'多步运算','Signed numbers':'正负数','Fractions':'分数'})[topic]],
     [/^(\d+) of (\d+) shown$/, (_, n, total) => '已显示 ' + n + ' / ' + total + ' 步'],
     [/^(Try first|Worked solution) · (\d+) attempts? recorded$/, (_, mode, n) => (mode === 'Try first' ? '先尝试' : '完整例题') + '，已记录 ' + n + ' 次尝试'],

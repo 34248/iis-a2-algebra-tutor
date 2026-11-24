@@ -41,24 +41,24 @@
         <p class="question-label">Solve for x</p><h2 id="current-equation" class="equation">2x + 3 = 11</h2>
         <p id="progress" class="muted">Choose how you want help, then start.</p>
         <p id="reply" class="feedback" role="status" aria-live="polite">Your working stays here while you practise.</p>
-        <label for="attempt">Your next equation or explanation</label>
-        <textarea id="attempt" rows="3" placeholder="Write a complete equation to check it, or describe your approach."></textarea>
-        <div class="buttons working-buttons"><button id="check-step" disabled>Check this equation</button><button id="save-attempt" class="quiet" disabled>Record explanation</button></div>
+        <label for="attempt">Your working or explanation</label>
+        <textarea id="attempt" rows="5" maxlength="2500" placeholder="Write one equation per line. Keep earlier steps as you go."></textarea>
+        <div class="buttons working-buttons"><button id="check-step" disabled>Check my steps</button><button id="save-attempt" class="quiet" disabled>Record explanation</button></div>
         <p class="sub">Check whether your equation has the same solution. You can also save a written explanation without grading it.</p>
-        <p id="step-feedback" class="feedback" role="status" aria-live="polite" hidden></p>
-        <div class="help-area"><div class="help-top"><h3>Worked steps</h3><span id="hint-count" class="muted">0 of 3 shown</span></div>
-          <progress id="hint-progress" max="3" value="0" aria-label="Worked steps visible"></progress>
-          <p id="steps-empty" class="empty">You can refer back to each step you open.</p>
-          <ol id="steps" class="steps"></ol>
-          <button id="hint" class="primary" disabled>Reveal next step <span aria-hidden="true">→</span></button>
-        </div>
+        <div id="step-feedback" class="feedback" role="status" aria-live="polite" hidden></div>
         <div class="answer-area"><label for="answer">Your final answer</label><div class="answer-row"><input id="answer" placeholder="Enter a number or fraction" autocomplete="off"><button id="check-answer" disabled>Check answer</button></div></div>
         <section id="completion" class="completion" hidden><h3>Equation solved.</h3><p id="completion-summary"></p><button id="try-independent" class="primary">Try a new question without hints <span aria-hidden="true">→</span></button></section>
         <div class="record-area"><div><h3>This session</h3><p id="session-facts" class="sub">Start a practice session to create a record.</p></div><button id="export-trace" class="quiet" disabled>Download CSV</button></div>
         <p id="export-status" class="sub" aria-live="polite"></p>
         <details class="events"><summary>View practice events</summary><ul id="events"></ul></details>
       </section>
-      <section class="card independent-card" id="independent">
+        <aside class="card hint-card" aria-labelledby="worked-heading"><div class="help-top"><h2 id="worked-heading">Worked steps</h2><span id="hint-count" class="muted">0 of 3 shown</span></div>
+          <progress id="hint-progress" max="3" value="0" aria-label="Worked steps visible"></progress>
+          <p id="steps-empty" class="empty">You can refer back to each step you open.</p>
+          <ol id="steps" class="steps"></ol>
+          <button id="hint" class="primary" disabled>Reveal next step <span aria-hidden="true">→</span></button>
+        </aside>
+      <section class="card independent-card" id="independent" hidden>
         <h2>Try one on your own</h2>
         <label for="transfer">Choose a new question</label><select id="transfer"></select>
         <p id="transfer-equation" class="equation small-equation">4x + 1 = 13</p>

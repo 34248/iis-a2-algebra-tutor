@@ -187,13 +187,14 @@ def _action(payload):
     verb = payload.get('action')
     if verb == 'attempt':
         state['step_feedback'] = None
-        state['attempts'].append(text(payload.get('attempt'), 'Attempt'))
+        state['attempts'].append(text(payload.get('attempt'), 'Attempt', limit=2500))
         state['events'].append('Attempt recorded; not automatically graded.')
         state['reply'] = 'Attempt recorded. Select Next hint when you want one checked step.'
     elif verb == 'check_step':
         if not state['equation_feedback']:
             raise UserError('Equation feedback is disabled for this comparison. Record an attempt or request an available worked step.')
-        proposed = text(payload.get('attempt'), 'Your line of working')
+        proposed = payload.get('attempt')
+        text(proposed, 'Your working', limit=2500)
         feedback = algebra.check_step(PROBLEMS[state['problem_id']]['question'], proposed)
         state['attempts'].append(proposed)
         state['step_checks'] += 1
