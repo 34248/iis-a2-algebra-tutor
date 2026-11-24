@@ -18,6 +18,7 @@
     <aside class="setup">
       <section class="card setup-card">
         <h2>Practice settings</h2>
+        <label for="tester">Tester code (optional)</label><input id="tester" type="text" placeholder="P01" maxlength="6" autocomplete="off" aria-describedby="tester-note"><p class="sub" id="tester-note">Use the same code for repeat tests. Leave blank for private practice.</p>
         <label for="problem">Choose a problem</label><select id="problem" aria-describedby="problem-kind"></select>
         <p id="problem-kind" class="muted"></p>
         <div id="generator" hidden>
@@ -30,7 +31,7 @@
         <select id="condition"><option value="gradual">Try first · step hints</option><option value="immediate">Full worked example</option></select>
         <p id="mode-description" class="sub">Write your first attempt to unlock a hint.</p>
         <button id="start" class="primary full">Start practice</button>
-        <p class="setup-note">Starting again creates a fresh session. Download your record first if you want to keep it.</p>
+        <p class="setup-note">Starting again creates a separate practice record.</p>
       </section>
       <details id="inspector" class="card fold"><summary>Demo controls</summary>
         <label for="equation">Equation sent to the tutor</label><input id="equation" value="2x + 3 = 11" autocomplete="off">
@@ -54,7 +55,7 @@
         <div id="step-feedback" class="feedback" role="status" aria-live="polite" hidden></div>
         <div class="answer-area"><label for="answer">Your final answer</label><div class="answer-row"><input id="answer" placeholder="Enter a number or fraction" autocomplete="off"><button id="check-answer" disabled>Check answer</button></div></div>
         <section id="completion" class="completion" hidden><h3>Equation solved.</h3><p id="completion-summary"></p><button id="try-independent" class="primary">Try a new question without hints <span aria-hidden="true">→</span></button></section>
-        <div class="record-area"><div><h3>This session</h3><p id="session-facts" class="sub">Start a practice session to create a record.</p></div><button id="export-trace" class="quiet" disabled>Download CSV</button></div>
+        <div class="record-area"><div><h3>This session</h3><p id="session-facts" class="sub">Start a practice session to create a record.</p></div><a class="offline" id="open-results" href="/results.html" target="_blank" rel="noopener">Live results</a></div>
         <p id="export-status" class="sub" aria-live="polite"></p>
         <details class="events"><summary>View practice events</summary><ul id="events"></ul></details>
       </section>

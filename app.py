@@ -19,6 +19,7 @@ import model
 import telemetry
 import algebra
 import generator
+import live_results
 
 LOGGER = logging.getLogger(__name__)
 PROBLEMS = {item['id']: item for item in json.loads(
@@ -145,7 +146,11 @@ def _start(payload):
             not isinstance(version, str) or version not in {'baseline', 'revised'}):
         raise UserError('Choose a listed problem, condition and version.')
     question = text(payload.get('question'), 'Equation')
+    tester = payload.get('tester', '')
+    if not isinstance(tester, str) or not re.fullmatch(r'(?:P[0-9]{2,5})?', tester.strip().upper()):
+        raise UserError('Use a tester code such as P01, or leave it empty.')
     state = {
+        'tester': tester.strip().upper(), 'paired_problem': PROBLEMS[pid]['transfer_id'],
         'session': secrets.token_urlsafe(24), 'problem_id': pid,
         'question': question, 'condition': condition, 'version': version,
         'status': 'ready', 'steps': [], 'attempts': [], 'events': [], 'reply': '',
@@ -332,6 +337,12 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         route = urlsplit(self.path).path
+        if route == '/api/results':
+            if self.headers.get('Host') not in {f'127.0.0.1:{self.server.server_port}', f'localhost:{self.server.server_port}'}:
+                return self.respond({'error':'Use the local results page.'}, 403)
+            with telemetry.LOCK:
+                sessions = live_results.snapshot()
+            return self.respond({'sessions': sessions})
         if route == '/api/config':
             with LOCK:
                 config = {'lab4': False, 'app_id': 'iis-algebra-tutor', 'version': '4',
@@ -340,6 +351,8 @@ class Handler(BaseHTTPRequestHandler):
                           'transfer': [catalogue_item(p) for p in TRANSFER.values()]}
             return self.respond(config)
         assets = {
+            '/results.html': ('results.html', 'text/html; charset=utf-8'),
+            '/results.js': ('results.js', 'text/javascript; charset=utf-8'),
             '/': ('index.html', 'text/html; charset=utf-8'),
             '/index.html': ('index.html', 'text/html; charset=utf-8'),
             '/client.js': ('client.js', 'text/javascript; charset=utf-8'),
@@ -385,6 +398,7 @@ if __name__ == '__main__':
     parser.add_argument('--open', action='store_true', help='Open the local browser after startup')
     args = parser.parse_args()
     restore_pairs()
+    live_results.restore(telemetry.DATA_DIR)
     try:
         server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
     except OSError:

@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live results | Algebra practice</title><link rel="stylesheet" href="/style.css"><script defer src="/results.js"></script>
+</head><body><main class="app results">
+<header class="top"><a class="brand" href="/" data-zh="代数练习">Algebra practice</a><button id="language" class="language-switch"></button></header>
+<div class="intro"><h1 data-zh="实时结果">Live results</h1></div>
+<section class="card"><label for="tester-filter" data-zh="测试者编号">Tester code</label>
+<select id="tester-filter"></select><p id="sync" class="sub" role="status"></p>
+<div class="results-scroll" tabindex="0" aria-label="Practice sessions"><table><caption data-zh="每次练习单独显示。独立题首答只计入配对题的第一次有效数字答案。">One row per session. Independent first answer counts the first valid numeric answer on the paired question.</caption>
+<thead><tr><th data-zh="测试者">Tester</th><th data-zh="开始时间">Started</th><th data-zh="题目">Problem</th><th data-zh="模式">Help mode</th><th data-zh="尝试次数">Attempts</th><th data-zh="已展示步骤数">Steps shown</th><th data-zh="练习题最近结果">Practice latest</th><th data-zh="配对题">Paired item</th><th data-zh="独立题首答">Independent first</th><th data-zh="独立题最近结果">Independent latest</th></tr></thead>
+<tbody id="rows"></tbody></table></div><p id="empty" class="feedback" hidden></p></section>
+</main></body></html>

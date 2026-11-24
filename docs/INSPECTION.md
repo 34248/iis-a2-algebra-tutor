@@ -8,13 +8,13 @@ For the current release select A10, enter the first worked line shown in the REA
 | --- | --- | --- | --- |
 | Attempt and request help | Choose A01 and Try first; start. Before recording work, inspect the unavailable hint. Enter 2x = 8, check the equation, then request one hint. Restart A01 in immediate mode. | The check accepts an equivalent equation without releasing steps. One requested hint releases one step. Immediate mode displays all the same checked content. | [Current workspace](../evidence/07-learning-workspace.png); [story 1](figures/story-1.png); app.py and model.py |
 | Correct a mistaken step | In A01, check 2x = 14, then check 2x = 8. | The first changes the solution; the second is equivalent. Neither operation releases another hint or grades the explanation. | [Story 2](figures/story-2.png); algebra.py; test_learning.py |
-| Complete and practise independently | Choose A09, start, check 2(x-1) + 3x = 24, and enter final answer 26/5. Open its paired new question T09 and answer 6. Download CSV. | Equivalent line; practice completion; paired item without worked hints; a real session download. Retries remain available, so this is not a controlled post-test. | [Multi-step workspace](../evidence/10-multi-step-workspace.png); [completion example on A05](../evidence/08-completed-and-independent.png); [story 3](figures/story-3.png); app.py and telemetry.py |
+| Complete and practise independently | Enter tester code P01, choose A09, start, check 2(x-1) + 3x = 24, and enter final answer 26/5. Open its paired new question T09 and answer 6. Open Live results. | Equivalent line; practice completion; paired item without worked hints; a P01 row with the first and latest paired outcome. Retries remain available, so this is not a controlled post-test. | [Multi-step workspace](../evidence/10-multi-step-workspace.png); [completion example on A05](../evidence/08-completed-and-independent.png); [story 3](figures/story-3.png); app.py and telemetry.py |
 
 The completion screenshot shows the separately tested fraction pair A05/T05, not the A09 input in this walkthrough. Figures are illustrative storyboards; screenshots are captured software runs.
 
 ## Check boundaries
 
-Disable Allow equation feedback under Demo controls and start a new session. Equation checks must be unavailable in both help modes; equation_feedback in CSV records the setting. This controls one source of additional feedback but does not assign research conditions.
+Disable Allow equation feedback under Demo controls and start a new session. Equation checks must be unavailable in both help modes; equation_feedback in the local event record records the setting. This controls one source of additional feedback but does not assign research conditions.
 
 Use the unavailable-response option and request help after recording an attempt. Existing steps should remain and no additional step should appear. Restore availability and retry. The baseline option deliberately skips the input check; use it only to inspect the retained defect, not as a study treatment.
 

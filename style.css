@@ -39,3 +39,11 @@ main > .language-switch { float: right; margin: 0 0 8px 10px; }
   .workspace { grid-template-columns:minmax(190px,.68fr) minmax(0,3fr); }
   .learning { grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); }
 }
+
+.results-scroll { overflow-x:auto; margin-block:18px; }
+.results table { width:100%; border-collapse:collapse; font-size:14px; }
+.results th,.results td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); }
+.results th { color:var(--accent); background:var(--sunk); }
+.results caption { text-align:left; padding-bottom:10px; color:var(--muted); }
+.results select { max-width:250px; }
+#tester-note { min-height:0; }

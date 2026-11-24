@@ -31,14 +31,13 @@ function fail(error) {
 }
 
 function syncControls() {
-  for (const id of ['problem', 'equation', 'condition', 'version', 'transfer', 'equation-feedback','difficulty','generate']) {
+  for (const id of ['problem', 'equation', 'condition', 'version', 'transfer', 'equation-feedback','difficulty','generate','tester']) {
     $(id).disabled = busy || !config;
   }
   $('start').disabled = busy || !config;
   $('save-attempt').disabled = $('check-answer').disabled =
     busy || !current || current.status !== 'ready';
   $('hint').disabled = busy || !current || !current.next_hint_allowed;
-  $('export-trace').disabled = busy || !session;
   $('transfer-check').disabled = busy || !config;
   $('check-step').disabled = busy || !current || current.status !== 'ready' || !current.equation_feedback;
   $('try-independent').disabled = busy || !current || !current.solved;
@@ -137,7 +136,6 @@ function resetPractice(message) {
   for (const id of ['steps', 'events']) $(id).replaceChildren();
   $('attempt').value = '';
   $('answer').value = '';
-  $('export-status').textContent = '';
   $('progress').textContent = 'Start a practice session.';
   $('reply').textContent = message;
   $('reply').hidden = false;
@@ -148,12 +146,16 @@ function resetPractice(message) {
 
 bind('start', async () => {
   // Clear before waiting, preserving anything typed during the request.
+  const code = $('tester').value.trim().toUpperCase();
+  if (code && !/^P[0-9]{2,5}$/.test(code)) throw Error('Use a tester code such as P01, or leave it empty.');
+  $('tester').value = code;
   resetPractice('Starting a new practice session.');
   render(await api('/api/start', {
     problem_id: $('problem').value,
     question: $('equation').value,
     condition: $('condition').value,
     version: $('version').value,
+    tester: code,
     unavailable: $('unavailable').checked,
     equation_feedback: $('equation-feedback').checked,
   }));
@@ -239,26 +241,7 @@ bind('transfer-check', async () => {
     : 'Your answer changed while checking. Check the current answer again.';
 });
 
-bind('export-trace', async () => {
-  const result = await api('/api/export', {session});
-  const url = URL.createObjectURL(new Blob(['\ufeff' + result.csv], {
-    type: 'text/csv;charset=utf-8',
-  }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = result.filename;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  const saveMessage = result.local_file_saved ? '' :
-    ' The server copy could not be saved; keep the downloaded CSV.';
-  $('export-status').textContent = `${result.rows} recorded events included. ` +
-    'CSV download started.' + saveMessage +
-    ' This is an inspection trace, not a learning-effect result.';
-});
-
-for (const id of ['condition', 'version', 'equation', 'equation-feedback']) {
+for (const id of ['condition', 'version', 'equation', 'equation-feedback', 'tester']) {
   $(id).addEventListener('change', () => resetPractice(
     'Setup changed. Start a new practice session.'));
 }
@@ -352,6 +335,11 @@ $('problem').addEventListener('change', () => { $('generation-status').textConte
 /* Shared display preferences for the three practice pages. */
 function installBilingualView() {
   const labels = new Map(Object.entries({
+    'Tester code (optional)': '测试者编号（可留空）',
+    'Use the same code for repeat tests. Leave blank for private practice.': '同一人重复测试请用同一编号；留空则不显示在实时结果页。',
+    'Use a tester code such as P01, or leave it empty.': '请输入 P01 这样的编号，或留空。',
+    'Live results': '实时结果',
+    'Starting again creates a separate practice record.': '重新开始会单独记录一次练习。',
     'New question difficulty': '新题难度',
     'Basic': '基础', 'Multi-step': '多步', 'Challenge': '挑战',
     'Generate a new question': '生成新题',
@@ -499,6 +487,7 @@ function installBilingualView() {
   });
   function refresh() {
     main.translate = !enabled;
+    $('open-results').href = '/results.html?lang=' + (enabled ? 'both' : 'en');
     visit(main);
     for (const field of main.querySelectorAll('[placeholder]')) {
       const original = field.dataset.placeholderEn ?? field.placeholder;
