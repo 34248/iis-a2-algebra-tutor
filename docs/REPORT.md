@@ -2,7 +2,7 @@
 
 IIS A2 Project Report
 
-Word count: 1214 total (130 abstract, 1084 main text including headings and disclosures).
+Word count: 1198 total (130 abstract, 1068 main text including headings and disclosures).
 
 ## Abstract
 
@@ -12,7 +12,7 @@ How much help should a tutor give a student who is halfway through an equation? 
 
 A1 asked whether students who attempt a problem before seeing help can later solve a related problem independently. Koedinger and Aleven (2007) describe the difficulty of deciding when to give information and when to leave the next move to the learner. The intended users here are university students revising algebra. For a student who can already solve a two-step equation mentally, opening a hint says little about the value of the help. The harder items give that student a reason to pause, particularly when a minus sign applies to an entire bracket.
 
-The prototype grew out of the Lab4 tutor. In a later trial, image import read only the final number in a screenshot of a simple equation. That left the learner correcting the transcription before they could try any algebra. Each saved question stays the same across modes, including locally generated pairs. It also makes an error easier to locate: the author can check the question, the learner’s line and the next hint against one another. The original lab and its reuse are documented in the project’s provenance record. Students can also try a two-variable system separately. Only the single-variable exercises feed the help-mode comparison.
+The prototype grew out of the Lab4 tutor. In a later trial, image import read only the final number in a screenshot of a simple equation. That left the learner correcting the transcription before they could try any algebra. Each saved question stays the same across modes, including locally generated pairs. It also makes an error easier to locate: the author can check the question, the learner’s line and the next hint against one another. The original lab and its reuse are documented in the project’s provenance record.
 
 ## Design choices and supporting evidence
 
@@ -66,7 +66,7 @@ OpenAI Codex assisted with implementation, exercise drafting, software checks an
 
 ## Repository and submitted version
 
-Local application revision d931878 on the algebra-live-results branch. The README gives run instructions and links to the development record. Public repository and README URLs are outstanding.
+Local application revision 6c24ce9 on the algebra-live-results branch. The README gives run instructions and links to the development record. Public repository and README URLs are outstanding.
 
 ## References
 
