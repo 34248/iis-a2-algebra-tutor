@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT))
 import model
 import telemetry
 import algebra
+import generator
 
 LOGGER = logging.getLogger(__name__)
 PROBLEMS = {item['id']: item for item in json.loads(
@@ -280,6 +281,43 @@ def export_trace(payload):
         return telemetry.export(session_for(payload))
 
 
+def catalogue_item(item):
+    return {key: item[key] for key in ('id', 'question', 'difficulty', 'transfer_id') if key in item}
+
+
+def restore_pairs():
+    for path in sorted((telemetry.DATA_DIR / 'generated').glob('*.json')):
+        practice, partner = json.loads(path.read_text(encoding='utf-8'))
+        algebra.validate_catalog({practice['id']: practice}, {partner['id']: partner})
+        PROBLEMS[practice['id']] = practice
+        TRANSFER[partner['id']] = partner
+
+
+def generate_pair(payload):
+    level = payload.get('difficulty')
+    if level not in generator.LEVELS:
+        raise UserError('Choose a listed difficulty.')
+    with LOCK:
+        identifier = secrets.token_hex(4).upper()
+        directory = telemetry.DATA_DIR / 'generated'
+        directory.mkdir(parents=True, exist_ok=True)
+        while (directory / (identifier + '.json')).exists():
+            identifier = secrets.token_hex(4).upper()
+        used = {p['question'] for bank in (PROBLEMS, TRANSFER) for p in bank.values()}
+        practice, partner = generator.pair(level, identifier, used)
+        algebra.validate_catalog({practice['id']: practice}, {partner['id']: partner})
+        target = directory / (identifier + '.json')
+        temporary = target.with_suffix('.tmp')
+        try:
+            temporary.write_text(json.dumps([practice, partner]), encoding='utf-8')
+            temporary.replace(target)
+        finally:
+            temporary.unlink(missing_ok=True)
+        PROBLEMS[practice['id']] = practice
+        TRANSFER[partner['id']] = partner
+        return {'practice': catalogue_item(practice), 'partner': catalogue_item(partner)}
+
+
 class Handler(BaseHTTPRequestHandler):
     def respond(self, data, status=200):
         self.send_body(json.dumps(data).encode(), 'application/json; charset=utf-8', status)
@@ -295,13 +333,12 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         route = urlsplit(self.path).path
         if route == '/api/config':
-            return self.respond({
-                'lab4': False, 'app_id': 'iis-algebra-tutor', 'version': '4',
-                'problems': [{'id': p['id'], 'question': p['question'], 'difficulty': p['difficulty'], 'transfer_id': p['transfer_id']}
-                             for p in PROBLEMS.values()],
-                'transfer': [{'id': pid, 'question': p['question'], 'difficulty': p['difficulty']}
-                             for pid, p in TRANSFER.items()],
-            })
+            with LOCK:
+                config = {'lab4': False, 'app_id': 'iis-algebra-tutor', 'version': '4',
+                          'local_generation': True,
+                          'problems': [catalogue_item(p) for p in PROBLEMS.values()],
+                          'transfer': [catalogue_item(p) for p in TRANSFER.values()]}
+            return self.respond(config)
         assets = {
             '/': ('index.html', 'text/html; charset=utf-8'),
             '/index.html': ('index.html', 'text/html; charset=utf-8'),
@@ -325,7 +362,11 @@ class Handler(BaseHTTPRequestHandler):
             payload = json.loads(self.rfile.read(length))
             if not isinstance(payload, dict):
                 raise UserError('A JSON object is required.')
-            actions = {'/api/start': start, '/api/action': action,
+            if urlsplit(self.path).path == '/api/generate' and (
+                    self.headers.get('Host') not in {f'localhost:{port}', f'127.0.0.1:{port}'} or
+                    self.headers.get_content_type() != 'application/json'):
+                return self.respond({'error': 'Use the local practice page.'}, 403)
+            actions = {'/api/start': start, '/api/action': action, '/api/generate': generate_pair,
                        '/api/transfer': transfer, '/api/export': export_trace}
             handler = actions.get(urlsplit(self.path).path)
             if handler is None:
@@ -343,6 +384,7 @@ if __name__ == '__main__':
     parser.add_argument('--port', type=int, default=8000)
     parser.add_argument('--open', action='store_true', help='Open the local browser after startup')
     args = parser.parse_args()
+    restore_pairs()
     try:
         server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
     except OSError:

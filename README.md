@@ -1,16 +1,18 @@
 # Controlled help in algebra practice
 
-README prose word count: 411 (excluding headings and commands).
+README prose word count: 461 (excluding headings and commands).
 
 ## Run the tutor
 
 Open run.cmd on Windows, or run the following from this directory with Python 3.12. Open the address printed by the server. No external services or Python packages are needed for practice.
 
 ```text
-python app.py --port 8767 --open
+python app.py --port 8768 --open
 ```
 
 Choose a problem and a help mode, then start. A10 through A13 combine denominators, nested brackets, decimal coefficients and variables on both sides. Submit a line such as “Multiply both sides by 12: 3(3x - 2) - 2(x + 1) = 4(x - 1)” on A10. Use a space or a line break between complete equations and press Check my steps. Each step is compared with the original equation. On desktop, hints appear to the right. The paired independent exercise opens after the final answer is correct. Written explanations can also be recorded without a score. The language button switches between English and bilingual English–Chinese labels.
+
+To add a pair, choose Basic, Multi-step or Challenge and select Generate a new question. The tutor samples coefficients locally, verifies each step and both answers, and saves the pair under data/generated. Switch help mode to inspect the same problem again. Generated questions remain in the menu after a restart.
 
 ## Try the comparison
 
@@ -28,7 +30,7 @@ The project extends the Lab4 tutor in the [provenance record](docs/PROVENANCE.md
 python -m unittest discover -v
 ```
 
-With the local app running on port 8767, run the challenge walkthrough with Node and Playwright. Set BROWSER_EXECUTABLE if using an installed Chromium browser. TUTOR_URL can point to a different local port.
+With the local app running on port 8768, run the challenge walkthrough with Node and Playwright. Set BROWSER_EXECUTABLE if using an installed Chromium browser. TUTOR_URL can point to a different local port.
 
 ```text
 node tools/browser_challenge.cjs

@@ -31,7 +31,7 @@ function fail(error) {
 }
 
 function syncControls() {
-  for (const id of ['problem', 'equation', 'condition', 'version', 'transfer', 'equation-feedback']) {
+  for (const id of ['problem', 'equation', 'condition', 'version', 'transfer', 'equation-feedback','difficulty','generate']) {
     $(id).disabled = busy || !config;
   }
   $('start').disabled = busy || !config;
@@ -304,22 +304,42 @@ for (const [field, button] of [['answer', 'check-answer'], ['transfer-answer', '
   });
 }
 syncControls();
+function addOption(id, item) {
+  const generated = /^[GU]/.test(item.id);
+  const option = node('option', generated ? item.question : item.id + ' · ' + item.difficulty);
+  option.value = item.id;
+  $(id).append(option);
+}
+
+function updateCount() {
+  const size = document.querySelector('.catalog-size');
+  size.replaceChildren(node('span', config.problems.length + ' practice items'), document.createElement('br'),
+    node('span', config.transfer.length + ' new questions without hints'));
+}
+
+bind('generate', async () => {
+  $('generation-status').textContent = '';
+  const pair = await api('/api/generate', {difficulty: $('difficulty').value});
+  config.problems.push(pair.practice);
+  config.transfer.push(pair.partner);
+  addOption('problem', pair.practice);
+  addOption('transfer', pair.partner);
+  $('problem').value = pair.practice.id;
+  $('problem').dispatchEvent(new Event('change'));
+  updateCount();
+  $('generation-status').textContent = 'Saved on this computer. Select Start practice to begin.';
+});
+$('problem').addEventListener('change', () => { $('generation-status').textContent = ''; });
 (async () => {
   try {
     const response = await fetch('/api/config');
     if (!response.ok) throw Error('Could not load the checked practice items. Reload to retry.');
     const loaded = await response.json();
-    for (const item of loaded.problems) {
-      const option = node('option', item.id + ' · ' + item.difficulty);
-      option.value = item.id;
-      $('problem').append(option);
-    }
-    for (const item of loaded.transfer) {
-      const option = node('option', item.id + ' · ' + item.difficulty);
-      option.value = item.id;
-      $('transfer').append(option);
-    }
+    for (const item of loaded.problems) addOption('problem', item);
+    for (const item of loaded.transfer) addOption('transfer', item);
     config = loaded;
+    $('generator').hidden = !loaded.local_generation;
+    updateCount();
     $('problem-kind').textContent = topicNote(loaded.problems[0].difficulty);
     $('current-equation').textContent = loaded.problems[0].question;
     resetUnassisted();
@@ -332,6 +352,10 @@ syncControls();
 /* Shared display preferences for the three practice pages. */
 function installBilingualView() {
   const labels = new Map(Object.entries({
+    'New question difficulty': '新题难度',
+    'Basic': '基础', 'Multi-step': '多步', 'Challenge': '挑战',
+    'Generate a new question': '生成新题',
+    'Saved on this computer. Select Start practice to begin.': '题目已保存在本机，点击「开始练习」即可作答。',
     'Algebra practice': '代数练习',
     'Practise clearing denominators, nested brackets and decimal coefficients.': '综合练习去分母、嵌套括号和小数系数。',
     'Thirteen practice equations each have a paired independent question. The challenge set combines fractions, brackets and variables on both sides. The checker and worked steps run locally.': '13 道练习题各配一道独立题。挑战题结合分数、括号及两边含未知数的方程。所有检查和提示均在本机运行。',
@@ -417,6 +441,8 @@ function installBilingualView() {
     'Enter a number or fraction, optionally starting with x =.': '请输入数字或分数，也可以用 x = 开头。',
   }));
   const patterns = [
+    [/^(\d+) practice items$/, (_, n) => n + ' 道练习题'],
+    [/^(\d+) new questions without hints$/, (_, n) => n + ' 道无提示新题'],
     [/^Line (\d+), step (\d+) · (correct|changes the solution|cannot check)$/, (_, n, part, status) =>
       '第 ' + n + ' 行第 ' + part + ' 步 · ' + ({'correct':'正确','changes the solution':'改变了原解','cannot check':'无法判断'})[status]],
     [/^Line (\d+) · (correct|changes the solution|cannot check)$/, (_, n, status) =>

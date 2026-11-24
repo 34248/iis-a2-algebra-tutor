@@ -20,6 +20,12 @@
         <h2>Practice settings</h2>
         <label for="problem">Choose a problem</label><select id="problem" aria-describedby="problem-kind"></select>
         <p id="problem-kind" class="muted"></p>
+        <div id="generator" hidden>
+          <label for="difficulty">New question difficulty</label>
+          <select id="difficulty"><option value="Warm-up">Basic</option><option value="Multi-step">Multi-step</option><option value="Challenge">Challenge</option></select>
+          <button id="generate" class="full" type="button">Generate a new question</button>
+          <p id="generation-status" class="sub" role="status"></p>
+        </div>
         <label for="condition">How would you like help?</label>
         <select id="condition"><option value="gradual">Try first · step hints</option><option value="immediate">Full worked example</option></select>
         <p id="mode-description" class="sub">Write your first attempt to unlock a hint.</p>

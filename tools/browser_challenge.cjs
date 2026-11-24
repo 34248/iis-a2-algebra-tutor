@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const {pathToFileURL} = require('node:url');
 (async () => {
   const root = path.join(__dirname, '..');
-  const base = process.env.TUTOR_URL || 'http://127.0.0.1:8767/';
+  const base = process.env.TUTOR_URL || 'http://127.0.0.1:8768/';
   const b = await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE, args:['--no-proxy-server']});
   try {
     const page = await b.newPage({viewport:{width:1400,height:1000}});
@@ -13,7 +13,7 @@ const {pathToFileURL} = require('node:url');
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(base + '?lang=both');
     await page.locator('#problem option').first().waitFor({state:'attached'});
-    assert.equal(await page.locator('#problem option').count(),13);
+    assert(await page.locator('#problem option').count() >= 13);
     const items = JSON.parse(fs.readFileSync(path.join(root,'problems.json')));
     const pairs = JSON.parse(fs.readFileSync(path.join(root,'transfer.json')));
     await page.selectOption('#problem', 'A07');
