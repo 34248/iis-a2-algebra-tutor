@@ -2,11 +2,11 @@
 
 IIS A2 Project Report
 
-Word count: 1168 total (122 abstract, 1046 main text including headings and disclosures).
+Word count: 1172 total (125 abstract, 1047 main text including headings and disclosures).
 
 ## Abstract
 
-This browser-based tutor asks a practical question about algebra revision. After working through one equation, can a student solve a similar one without help? In one mode, students can ask what to do next and work out the result themselves. In the other, they can read the whole worked example, including the answer, from the start. Each of the thirteen built-in practice equations has a partner that tests the same skill with different numbers. The tutor checks students’ working and records their first answer to the partner question separately from any retries. Automated tests showed that the system could track this distinction across sessions. A comparison with students is still needed to find out which approach helps them solve a new equation.
+This browser-based tutor asks a practical question about algebra revision. After working through one equation, can a student solve a similar one without help? In one mode, students can ask what to do next and work out the result themselves. In the other, they can read the whole worked example, including the answer, from the start. Each of the thirteen built-in practice equations has a partner that tests the same skill with different numbers. The tutor checks students’ working and records whether their first answer to the partner question was correct, separately from any retries. Automated tests showed that the system could track this distinction across sessions. A comparison with students is still needed to find out which approach helps them solve a new equation.
 
 ## Problem and scope
 
@@ -48,15 +48,15 @@ Figure 3. Equation feedback flags a changed solution and recognises a corrected 
 
 ![story-3](figures/story-3.png)
 
-Figure 4. The observer sees P01’s first independent answer and the result after a retry.
+Figure 4. Live results shows whether P01’s first and latest independent answers were correct.
 
 ## Development evidence and limits
 
-An observer can open Live results in a second tab on the same computer. When a student with a tester code solves the equation, the board lists the equation, mode, attempts and steps viewed. The board refreshes every two seconds. For the paired question it preserves the first valid answer alongside the latest result, even after a successful retry. Students may also rate how helpful the steps were. An unfinished practice session never reaches the board, so these records alone cannot show how many students gave up.
+An observer can open Live results in a second tab on the same computer. When a student with a tester code solves the equation, the board lists the equation, mode, attempts and steps viewed. The board refreshes every two seconds. For the paired question it shows whether the first and latest valid answers were correct, even after a successful retry. Students may also rate how helpful the steps were. An unfinished practice session never reaches the board, so these records alone cannot show how many students gave up.
 
 At startup, exact arithmetic checks every built-in pair. Each intermediate equation must preserve the original solution, and substituting the final value must balance both sides. On A13, for instance, clearing the denominators still leaves several brackets to expand. Checking only the answer at the end would miss a sign error in an earlier line. The partner answer is checked separately.
 
-All 45 unit tests passed. In one automated browser test, P01 and P02 worked in separate sessions while a third tab displayed the results. P01 entered 1 on T01, then tried again with 3. The board kept the incorrect first attempt beside the correct latest result. Filtering for P02 brought up the other session. This test checked that retries and tester codes stayed separate.
+All 45 unit tests passed. In one automated browser test, P01 and 03 worked in separate sessions while a third tab displayed the results. P01 entered 1 on T01, then tried again with 3. The board kept the incorrect first attempt beside the correct latest result. Filtering for 03 brought up the other session. This test checked that retries and tester codes stayed separate.
 
 Bastani et al. (2025) tested high school students again after withdrawing AI assistance. For this prototype, the clearest comparison would be the proportion of students in each mode who solve a new, matched equation on their first unaided attempt. Later attempts already benefit from feedback. A study would need to measure prior knowledge, assign the modes before practice and pilot the harder pairs with students. Any difference would reflect the two modes as a whole: they change both when help appears and how much of the solution students see.
 
