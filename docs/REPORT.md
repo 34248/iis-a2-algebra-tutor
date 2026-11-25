@@ -2,7 +2,7 @@
 
 IIS A2 Project Report
 
-Word count: 1172 total (125 abstract, 1047 main text including headings and disclosures).
+Word count: 1164 total (125 abstract, 1039 main text including headings and disclosures).
 
 ## Abstract
 
@@ -66,7 +66,7 @@ OpenAI Codex helped implement the tutor, draft exercises, run software checks an
 
 ## Repository and submitted version
 
-Local application revision 1854181 on the algebra-live-results branch. The README gives run instructions and links to the development record. Public repository and README URLs are outstanding.
+Submitted version · [Public GitHub repository](https://github.com/34248/iis-a2-algebra-tutor) · [README](https://github.com/34248/iis-a2-algebra-tutor/blob/a2-submission-v1/README.md) · [a2-submission-v1](https://github.com/34248/iis-a2-algebra-tutor/tree/a2-submission-v1). The README gives run instructions and links to the development record.
 
 ## References
 

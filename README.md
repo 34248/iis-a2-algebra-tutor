@@ -1,6 +1,6 @@
 # Controlled help in algebra practice
 
-README prose word count: 512 (excluding headings and commands).
+README prose word count: 504 (excluding headings and commands).
 
 ## Run the tutor
 
@@ -37,4 +37,4 @@ node tools/browser_challenge.cjs
 node tools/browser_live_results.cjs
 ```
 
-The [report](docs/IIS_A2_Project_Report.pdf) includes the architecture and three illustrated interactions. This copy is for local review. Public GitHub links are still required for submission.
+The [report](docs/IIS_A2_Project_Report.pdf) includes the architecture and three illustrated interactions. The submitted version is tagged `a2-submission-v1`.
